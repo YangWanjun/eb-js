@@ -10,6 +10,7 @@ module.exports = {
     './src/Material.js',
     './src/Autocomplete.js',
     './src/Map.js',
+    './src/config.js',
   ],
   devtool: 'inline-source-map',
   plugins: [

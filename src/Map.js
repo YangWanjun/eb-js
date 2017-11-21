@@ -103,3 +103,7 @@ Map.prototype.InitMap = function (googleMap, gmap_id, olmap_id) {
     this.gmap = gmap;
     this.olMap = olMap;
 };
+
+Map.prototype.parkingLayer = {
+
+};
