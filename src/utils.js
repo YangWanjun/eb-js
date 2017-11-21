@@ -1,4 +1,4 @@
-module.exports = Utils = function() {
+Utils = function() {
 };
 
 Utils.prototype.getCookie = function(name) {
@@ -74,3 +74,5 @@ Utils.prototype.resizeCanvas = function (canvas) {
     canvas.height = canvas.offsetHeight * ratio;
     canvas.getContext("2d").scale(ratio, ratio);
 };
+
+module.exports = new Utils();

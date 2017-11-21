@@ -1,5 +1,4 @@
 var Utils = require('./Utils');
-var utils = new Utils();
 
 module.exports = Material = function() {
 };

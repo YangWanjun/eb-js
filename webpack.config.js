@@ -5,19 +5,26 @@ const webpack = require("webpack");
 module.exports = {
   entry: [
     './src/app.js',
-    './src/Utils.js',
     './src/Signature.js',
     './src/Material.js',
     './src/Autocomplete.js',
     './src/Map.js',
-    './src/config.js',
   ],
   devtool: 'inline-source-map',
+  resolve: {
+    extensions: ['.js'],
+    alias: {
+      'config': path.resolve(__dirname, './src/config'),
+      'utils': path.resolve(__dirname, './src/Utils'),
+    }
+  },
   plugins: [
     new CleanWebpackPlugin(['dist', '/workspace/areaparking/static/js']),
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
+      config: 'config',
+      utils: 'utils',
     }),
     //new webpack.optimize.UglifyJsPlugin({
     //  compress: {

@@ -29,7 +29,6 @@ Map.prototype.init = function (gmap_id, olmap_id, options) {
         }
     } else {
         loadGoogleMapsAPI({ key: 'AIzaSyBjzwjBMykNJikl12HQOuWsYxMmozvkhVU' }).then(function (googleMaps) {
-            console.log(googleMaps) //=> Object { Animation: Object, ... 
             self.InitMap(googleMaps, gmap_id, olmap_id);
         }).catch((err) => {
             console.error(err)
@@ -102,8 +101,24 @@ Map.prototype.InitMap = function (googleMap, gmap_id, olmap_id) {
 
     this.gmap = gmap;
     this.olMap = olMap;
+
+    this.CreateLayers();
 };
 
-Map.prototype.parkingLayer = {
+Map.prototype.CreateLayers = function (){
+    $.each(config.layers, function(index, layer) {
+        $.getJSON(layer.url, function(layerJSON) {
+            if(layerJSON.features.length > 0)
+            {
+                var layerSource = new ol.source.GeoJSON({
+                        style: styleFunction,
+                        defaultProjection: 'EPSG:4326',
+                        projection: "EPSG:3857",
+                        object: layerJSON
+                });
 
+                layer.setSource(layerSource);
+            }
+        });
+    });
 };
