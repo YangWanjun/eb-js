@@ -31,7 +31,7 @@ olMap.prototype.init = function (map_id, options) {
 };
 
 olMap.prototype.InitMap = function (map_id) {
-    var center = this.options.center || [139.692101, 35.689634];  // 139.692101, 35.689634 （東京都庁）
+    var center = this.options.center || [config.map.center.lng, config.map.center.lat];
     this.map = new ol.Map({
         target: map_id,
         controls: ol.control.defaults().extend([
@@ -46,8 +46,8 @@ olMap.prototype.InitMap = function (map_id) {
             projection: "EPSG:3857",
             center: ol.proj.transform( center, "EPSG:4326", "EPSG:3857" ),
             maxZoom: 21,
-            minZoom: 4,
-            zoom: 12
+            minZoom: config.map.minZoom,
+            zoom: config.map.zoom
         })
     });
 
