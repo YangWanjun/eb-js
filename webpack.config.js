@@ -8,7 +8,7 @@ module.exports = {
     './src/Signature.js',
     './src/Material.js',
     './src/Autocomplete.js',
-    './src/Map.js',
+    './src/olMap.js',
   ],
   devtool: 'inline-source-map',
   resolve: {
