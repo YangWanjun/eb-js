@@ -9,12 +9,13 @@ module.exports = {
     './src/Material.js',
     './src/Autocomplete.js',
     './src/olMap.js',
+    './src/gMap.js',
   ],
   devtool: 'inline-source-map',
   resolve: {
     extensions: ['.js'],
     alias: {
-      'config': path.resolve(__dirname, './src/config'),
+      'config': path.resolve(__dirname, './src/Config'),
       'utils': path.resolve(__dirname, './src/Utils'),
     }
   },
