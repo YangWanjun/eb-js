@@ -45,7 +45,8 @@ gMap.prototype.CreateLayers = function (){
         }); 
     });
     // InfoWindowを生成
-    var infoWindow = new google.maps.InfoWindow();
+    var offset = new google.maps.Size(0, -20);
+    var infoWindow = new google.maps.InfoWindow({pixelOffset: offset});
     // クリックイベントの定義
     self.map.data.addListener('mouseover', function(event) {
         // 表示位置
