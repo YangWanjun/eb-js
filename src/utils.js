@@ -80,18 +80,20 @@ Utils.prototype.autoFixColumns = function(tbl_id) {
     var obj = $("#" + tbl_id);
     var col_count = self.getTableColCount(tbl_id);
     var tbl_width = obj.width();
-    var col_width = Math.floor(tbl_width / col_count);
-    obj.css('table-layout', 'fixed');
-    obj.width(tbl_width);
+    var col_width = Math.floor(tbl_width / col_count) - 10; // padding: 5px;
+    // obj.css('table-layout', 'fixed');
+    // obj.width(tbl_width);
     $('tr', obj).each(function(index, tr){
-        $(tr).children().each(function(i, cell) {
+        var col_count = $(tr).children().length;
+        $(tr).children().each(function (i, cell) {
             var colspan = parseInt($(cell).attr('colspan'));
+            var text = $(cell).text() || '&nbsp';
             if (colspan && colspan > 0) {
                 var width = colspan * col_width;
-                $(cell).html("<div class='nowrap' style='width: " + width + "px'>" + $(cell).text() + "</div>");            
+                $(cell).html("<div class='nowrap' style='width: " + width + "px'>" + text + "</div>");
                 $(cell).width(width);
             } else {
-                $(cell).html("<div class='nowrap' style='width: " + col_width + "px'>" + $(cell).text() + "</div>");            
+                $(cell).html("<div class='nowrap' style='width: " + col_width + "px'>" + text + "</div>");
                 $(cell).width(col_width);
             }
         });
