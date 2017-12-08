@@ -75,4 +75,46 @@ Utils.prototype.resizeCanvas = function (canvas) {
     canvas.getContext("2d").scale(ratio, ratio);
 };
 
+Utils.prototype.autoFixColumns = function(tbl_id) {
+    var self = this;
+    var obj = $("#" + tbl_id);
+    var col_count = self.getTableColCount(tbl_id);
+    var tbl_width = obj.width();
+    var col_width = Math.floor(tbl_width / col_count);
+    obj.css('table-layout', 'fixed');
+    obj.width(tbl_width);
+    $('tr', obj).each(function(index, tr){
+        $(tr).children().each(function(i, cell) {
+            var colspan = parseInt($(cell).attr('colspan'));
+            if (colspan && colspan > 0) {
+                var width = colspan * col_width;
+                $(cell).html("<div class='nowrap' style='width: " + width + "px'>" + $(cell).text() + "</div>");            
+                $(cell).width(width);
+            } else {
+                $(cell).html("<div class='nowrap' style='width: " + col_width + "px'>" + $(cell).text() + "</div>");            
+                $(cell).width(col_width);
+            }
+        });
+    });
+};
+
+Utils.prototype.getTableColCount = function(tbl_id) {
+    // テーブルの列数を取得する、colspanも数えて計算する。
+    var obj = $("#" + tbl_id);
+    var count = 0;
+    if ($("thead tr", obj).length > 0) {
+        $("th", $("thead tr", obj).eq(0)).each(function(index, element) {
+            var colspan = parseInt($(element).attr('colspan'));
+            if (colspan && colspan > 0) {
+                count += colspan;
+            } else {
+                count += 1;
+            }
+        });
+    } else {
+        count = 0;
+    }
+    return count;
+}
+
 module.exports = new Utils();
