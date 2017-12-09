@@ -90,10 +90,10 @@ Utils.prototype.autoFixColumns = function(tbl_id) {
             var text = $(cell).text() || '&nbsp';
             if (colspan && colspan > 0) {
                 var width = colspan * col_width;
-                $(cell).html("<div class='nowrap' style='width: " + width + "px'>" + text + "</div>");
+                $(cell).html("<div class='nowrap' title='" + text + "' style='width: " + width + "px'>" + text + "</div>");
                 $(cell).width(width);
             } else {
-                $(cell).html("<div class='nowrap' style='width: " + col_width + "px'>" + text + "</div>");
+                $(cell).html("<div class='nowrap' title='" + text + "' style='width: " + col_width + "px'>" + text + "</div>");
                 $(cell).width(col_width);
             }
         });
