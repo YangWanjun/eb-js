@@ -192,4 +192,22 @@ Material.prototype.popup_anchor = function() {
         window.open(href, "", "width=750, height=500");
         return false;
     });
-}
+};
+
+Material.prototype.reflection_form_errors = function(form_obj, error_list) {
+    $(".invalid").removeClass('invalid');
+    $(form_obj).find('div.errors').remove();
+    $.each(Object.keys(error_list), function(index, key) {
+        var obj = $("#id_" + key);
+        if (obj.prop('tagName').toUpperCase() === 'SELECT') {
+            obj.parent().find('input[type=text]').addClass('invalid');
+        } else {
+            obj.addClass('invalid');
+        }
+        var error_elem = $.parseHTML('<div class="errors"></div>');
+        $.each(error_list[key], function(i, msg) {
+            $(error_elem).append('<small class="error">' + msg + '</small>');
+        });
+        obj.after(error_elem);
+    });
+};

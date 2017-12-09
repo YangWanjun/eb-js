@@ -22,15 +22,15 @@ Utils.prototype.csrfSafeMethod = function(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 };
 
-Utils.prototype.ajax_get = function(url, params, success, failure, always) {
-    this.ajax_request(url, "GET", params, success, failure, always);
+Utils.prototype.ajax_get = function(url, params) {
+    return this.ajax_request(url, "GET", params);
 };
 
-Utils.prototype.ajax_post = function(url, params, success, failure, always) {
-    this.ajax_request(url, "POST", params, success, failure, always);
+Utils.prototype.ajax_post = function(url, params) {
+    return this.ajax_request(url, "POST", params);
 };
 
-Utils.prototype.ajax_request = function(url, method, params, success, failure, always) {
+Utils.prototype.ajax_request = function(url, method, params) {
     var self = this;
     var csrftoken = self.getCookie('csrftoken');
 
@@ -42,17 +42,11 @@ Utils.prototype.ajax_request = function(url, method, params, success, failure, a
         }
     });
 
-    jQuery.ajax({
+    return jQuery.ajax({
         type: method,
         url: url,
         data: params,
         dataType: "json"
-    }).done(function(result) {
-        success(result);
-    }).fail(function(result) {
-        failure(result);
-    }).always(function(result) {
-        always(result);
     });
 };
 
@@ -87,13 +81,14 @@ Utils.prototype.autoFixColumns = function(tbl_id) {
         var col_count = $(tr).children().length;
         $(tr).children().each(function (i, cell) {
             var colspan = parseInt($(cell).attr('colspan'));
-            var text = $(cell).text() || '&nbsp';
+            var text = $(cell).text();
+            var innerHTML = $(cell).html() || '&nbsp';
             if (colspan && colspan > 0) {
                 var width = colspan * col_width;
-                $(cell).html("<div class='nowrap' title='" + text + "' style='width: " + width + "px'>" + text + "</div>");
+                $(cell).html("<div class='nowrap' title='" + text + "' style='width: " + width + "px'>" + innerHTML + "</div>");
                 $(cell).width(width);
             } else {
-                $(cell).html("<div class='nowrap' title='" + text + "' style='width: " + col_width + "px'>" + text + "</div>");
+                $(cell).html("<div class='nowrap' title='" + text + "' style='width: " + col_width + "px'>" + innerHTML + "</div>");
                 $(cell).width(col_width);
             }
         });
