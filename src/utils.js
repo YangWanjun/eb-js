@@ -57,7 +57,11 @@ Utils.prototype.isNumeric = function(num) {
 Utils.prototype.toNumComma = function(num) {
     int_comma = (num + "").replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     return int_comma;
-}
+};
+
+Utils.prototype.loading = function() {
+    $('<div class="loading"><div class="preloader-wrapper big active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div></div>').appendTo('body');
+};
 
 Utils.prototype.resizeCanvas = function (canvas) {
     // When zoomed out to less than 100%, for some very strange reason,
