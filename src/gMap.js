@@ -52,7 +52,7 @@ gMap.prototype.CreateLayers = function (){
         // 表示位置
         infoWindow.setPosition(event.latLng);
         // InfoWindow内のの内容
-        infoWindow.setContent('<b>' + event.feature.getProperty('name') + '</b><br/>' + 
+        infoWindow.setContent('<b>' + event.feature.getProperty('parking_lot_name') + '</b><br/>' + 
                               '車室数:' + event.feature.getProperty('position_count') + '<br/>' + 
                               '空き数:' + event.feature.getProperty('contract_count') + '<br/>' +
                               'フリーレント終了日:' + event.feature.getProperty('free_end_date') || '');
