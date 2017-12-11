@@ -53,6 +53,9 @@ gMap.prototype.CreateLayers = function (){
     self.map.data.addListener('click', function(event) {
         // 表示位置
         infoWindow.setPosition(event.latLng);
+        var id_create_circle = "btnCircle" + event.feature.getProperty('parking_lot');
+        var id_radius = "txtRadius" + event.feature.getProperty('parking_lot');
+        var id_clear_circles = "btnClear" + event.feature.getProperty('parking_lot');
         // InfoWindow内のの内容
         var content = '<b>' + event.feature.getProperty('parking_lot_name') + '</b><br/>' + 
             '所在地：' + event.feature.getProperty('address') + '<br/>' + 
@@ -62,20 +65,36 @@ gMap.prototype.CreateLayers = function (){
             '既契約者：' + event.feature.getProperty('is_existed_contractor_allowed') + '<br/>' + 
             '新テナント：' + event.feature.getProperty('is_new_contractor_allowed') + '<br/>' + 
             'フリーレント終了日：' + (event.feature.getProperty('free_end_date') || '') + '<br/>';
-        content += '半径：<input type="text" class="browser-default-radius" />m&nbsp;';
-        content += '<button onclick="ebjs.gmap.CreateCircle(' + event.feature.getProperty('lng') + ", " + event.feature.getProperty('lat') + ', this)">作成</button>';
+        content += '半径：<input type="text" id="' + id_radius + '" class="browser-default-radius" />m&nbsp;';
+        content += '<button id="' + id_create_circle + '">作成</button>'
+        content += '<a id="' + id_clear_circles + '">クリア</a>'
         infoWindow.setContent(content);
 		// IndowWindowを表示
-		infoWindow.open(self.map);
+        infoWindow.open(self.map);
+        $("#" + id_radius).val(config.setting.circle_radius);
+        // 円を作成するイベント
+        $("#" + id_create_circle).click(function(){
+            self.CreateCircle(event.feature.getProperty('lng'), event.feature.getProperty('lat'), $("#" + id_radius).val());
+        });
+        // 円をクリアイベント
+        $("#" + id_clear_circles).click(function(){
+            self.ClearCircles();
+        });
     });
 };
 
-gMap.prototype.CreateCircle = function(lng, lat, obj) {
+gMap.prototype.ClearCircles = function() {
     var self = this;
     $.each(self.circles, function(i, circle) {
         circle.setMap(null);
     });
-    var radius = parseInt($(obj).prev().val()) || 2000;
+    self.circles = [];
+};
+
+gMap.prototype.CreateCircle = function(lng, lat, radius) {
+    var self = this;
+    self.ClearCircles();
+    var radius = parseInt(radius) || 2000;
     var c = new google.maps.Circle({
         map: self.map,
         center: new google.maps.LatLng( lat, lng ),
