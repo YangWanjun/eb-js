@@ -50,6 +50,30 @@ Utils.prototype.ajax_request = function(url, method, params) {
     });
 };
 
+Utils.prototype.ajax_form = function(frmObj, success_fn, failure_fn, always_fn) {
+    self = this;
+    frmObj.submit(function(){
+        self.ajax_request(
+            $(this).attr('action'),
+            $(this).attr('method'),
+            $(this).serialize()
+        ).done(function(result) {
+            if (success_fn) {
+                success_fn(result);
+            }
+        }).fail(function(result) {
+            if (failure_fn) {
+                failure_fn(result);
+            }
+        }).always(function(result){
+            if (always_fn) {
+                always_fn(result);
+            }
+        });
+        return false;
+    });
+};
+
 Utils.prototype.isNumeric = function(num) {
     return !isNaN(num);
 };

@@ -211,3 +211,24 @@ Material.prototype.reflection_form_errors = function(form_obj, error_list) {
         obj.after(error_elem);
     });
 };
+
+Material.prototype.send_subscription_mail = function(frmId) {
+    var frmObj = $("#" + frmId);
+    utils.ajax_form(
+        frmObj,
+        function success_fn(result) {
+            if (result.error) {
+                alert(result.message);
+            } else {
+                window.location.reload();
+            }
+        },
+        function failure_fn(result) {
+            // debugger;
+        },
+        function always_fn(result) {
+            // debugger;
+        },
+    )
+    // frmObj.submit();
+};
