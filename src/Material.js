@@ -232,3 +232,18 @@ Material.prototype.send_subscription_mail = function(frmId) {
     )
     // frmObj.submit();
 };
+
+Material.prototype.send_user_subscription = function(frmId) {
+    var self = this;
+    var forms = self.get_sub_forms();
+};
+
+Material.prototype.get_sub_forms = function() {
+    var forms = Array();
+    $("iframe").each(function(i, iframeObj) {
+        $(iframeObj).contents().find("form").each(function(i, frm){
+            forms.push(frm);
+        });
+    });
+    return forms;
+};
