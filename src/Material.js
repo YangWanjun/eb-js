@@ -233,15 +233,35 @@ Material.prototype.send_subscription_mail = function(frmId) {
     // frmObj.submit();
 };
 
-Material.prototype.send_user_subscription = function(frmId) {
+Material.prototype.send_user_subscription = function() {
     var self = this;
     var forms = self.get_sub_forms();
+    $.each(forms, function(i, frm){
+        utils.ajax_request(
+            $(frm).attr('action'),
+            $(frm).attr('method'),
+            $(frm).serialize()
+        ).done(function(result) {
+            if (result.error) {
+                alert(result.message);
+                return false;
+            } else {
+
+            }
+        }).fail(function(result) {
+            return false;
+        }).always(function(result){
+            // debugger;
+        });
+    });
 };
 
 Material.prototype.get_sub_forms = function() {
     var forms = Array();
     $("iframe").each(function(i, iframeObj) {
         $(iframeObj).contents().find("form").each(function(i, frm){
+            // forms.push({url: iframeObj.src, form: frm});
+            $(frm).attr('action', iframeObj.src);
             forms.push(frm);
         });
     });
