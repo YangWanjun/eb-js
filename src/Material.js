@@ -1,5 +1,3 @@
-var Utils = require('./Utils');
-
 module.exports = Material = function() {
 };
 
@@ -212,23 +210,13 @@ Material.prototype.reflection_form_errors = function(form_obj, error_list) {
     });
 };
 
-Material.prototype.send_subscription_mail = function(frmId) {
+Material.prototype.send_subscription_mail = function(frmId, success_fn, failure_fn, always_fn) {
     var frmObj = $("#" + frmId);
     utils.ajax_form(
         frmObj,
-        function success_fn(result) {
-            if (result.error) {
-                alert(result.message);
-            } else {
-                window.location.reload();
-            }
-        },
-        function failure_fn(result) {
-            // debugger;
-        },
-        function always_fn(result) {
-            // debugger;
-        },
+        success_fn,
+        failure_fn,
+        always_fn,
     )
     // frmObj.submit();
 };
@@ -267,3 +255,28 @@ Material.prototype.get_sub_forms = function() {
     });
     return forms;
 };
+
+Material.prototype.task_finish = function(obj, url, task_name) {
+    var self = this;
+    // タスクを完了とします。
+    if (confirm('「' + task_name + '」のタスクを完了とします、よろしいですか？') == true) {
+        utils.ajax_put(url, {}).done(function(result) {
+            if (result.status === '99') {
+                Materialize.toast('「' + task_name + '」のタスクは完了しました。', 4000);
+                $(obj).prev().addClass('disabled');
+                $(obj).addClass('disabled');
+                self.update_task_info(obj);
+            }
+        });
+    }
+};
+
+Material.prototype.update_task_info = function(obj) {
+    $(obj).closest('li').find('.badge').addClass('grey');
+    $(obj).closest('li').find('.badge').attr('data-badge-caption', '完了');
+    // 進捗を更新する。
+    var total = $(obj).closest('ul.collapsible').find('li').length;
+    var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;
+    $(obj).closest('div.card-content').find('span.percentage').text(Math.round((count/total) * 1000) / 10);
+    $(obj).closest('div.card-content').find('.determinate').css('width', Math.round((count/total) * 1000) / 10 + '%');
+}

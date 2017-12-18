@@ -30,6 +30,10 @@ Utils.prototype.ajax_post = function(url, params) {
     return this.ajax_request(url, "POST", params);
 };
 
+Utils.prototype.ajax_put = function(url, params) {
+    return this.ajax_request(url, "PUT", params);
+};
+
 Utils.prototype.ajax_request = function(url, method, params) {
     var self = this;
     var csrftoken = self.getCookie('csrftoken');
