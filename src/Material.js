@@ -262,18 +262,41 @@ Material.prototype.task_finish = function(obj, url, task_name) {
     if (confirm('「' + task_name + '」のタスクを完了とします、よろしいですか？') == true) {
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '99') {
-                Materialize.toast('「' + task_name + '」のタスクは完了しました。', 4000);
-                $(obj).prev().addClass('disabled');
+                Materialize.toast('「' + task_name + '」のタスクは完了しました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
-                self.update_task_info(obj);
+                $(obj).prev().addClass('disabled');
+                self.update_task_info(obj, result.status);
             }
         });
     }
 };
 
-Material.prototype.update_task_info = function(obj) {
-    $(obj).closest('li').find('.badge').addClass('grey');
-    $(obj).closest('li').find('.badge').attr('data-badge-caption', '完了');
+Material.prototype.task_skip = function(obj, url, task_name) {
+    var self = this;
+    // タスクを完了とします。
+    if (confirm('「' + task_name + '」のタスクをスキップします、よろしいですか？') == true) {
+        utils.ajax_put(url, {}).done(function(result) {
+            if (result.status === '10') {
+                Materialize.toast('「' + task_name + '」のタスクはスキップしました。', config.setting.toast_timeout);
+                $(obj).addClass('disabled');
+                $(obj).next().addClass('disabled');
+                self.update_task_info(obj, result.status);
+            }
+        });
+    }
+};
+
+Material.prototype.update_task_info = function(obj, status) {
+    var name, color;
+    if (status === '99') {
+        name = '完了';
+        color = 'grey';
+    } else if (status === '10') {
+        name = 'スキップ';
+        color = 'grey';
+    }
+    $(obj).closest('li').find('.badge').addClass(color);
+    $(obj).closest('li').find('.badge').attr('data-badge-caption', name);
     // 進捗を更新する。
     var total = $(obj).closest('ul.collapsible').find('li').length;
     var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;

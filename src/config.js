@@ -2,7 +2,7 @@ module.exports = Config = {
     layers: [
         {
             name: 'parking_lot',
-            url: 'http://ap.mopa.jp/api/map-board/'
+            url: 'http://ap.mopa.jp/api/whiteboard/'
         },
     ],
     map: {
@@ -11,6 +11,7 @@ module.exports = Config = {
         zoom: 12,
     },
     setting: {
-        circle_radius: 0,
+        circle_radius: 0,           // 地図上で円作成時のデフォルト半径
+        toast_timeout: 10000,       // ダイアログのタイムアウト時間（10秒）
     },
 }
