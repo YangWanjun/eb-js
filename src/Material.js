@@ -286,6 +286,21 @@ Material.prototype.task_skip = function(obj, url, task_name) {
     }
 };
 
+Material.prototype.contract_cancel = function(obj, url) {
+    var self = this;
+    // タスクを完了とします。
+    if (confirm('このタスクをキャンセルすると、契約は破棄することになるので、よろしいですか？') == true) {
+        utils.ajax_put(url, {}).done(function(result) {
+            if (result.status === '91') {
+                Materialize.toast('契約はキャンセルしました。', config.setting.toast_timeout);
+                $(obj).addClass('disabled');
+                $(obj).next().addClass('disabled');
+                self.update_task_info(obj, result.status);
+            }
+        });
+    }
+};
+
 Material.prototype.update_task_info = function(obj, status) {
     var name, color;
     if (status === '99') {
