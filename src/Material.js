@@ -224,24 +224,34 @@ Material.prototype.send_subscription_mail = function(frmId, success_fn, failure_
 Material.prototype.send_user_subscription = function() {
     var self = this;
     var forms = self.get_sub_forms();
-    $.each(forms, function(i, frm){
+    var error = false;
+    $.each(forms, function(i, frm) {
         utils.ajax_request(
             $(frm).attr('action'),
             $(frm).attr('method'),
             $(frm).serialize()
         ).done(function(result) {
+            error = result.error;
             if (result.error) {
-                alert(result.message);
+                if (result.message) {
+                    console.log(result.message)
+                } else {
+                    $.each(Object.keys(result), function(index, key) {
+                        console.log(result[key])
+                    });
+                }
                 return false;
             } else {
-
+                // debugger;
             }
         }).fail(function(result) {
             return false;
-        }).always(function(result){
+        }).always(function(result) {
             // debugger;
         });
     });
+    if (error) {
+    }
 };
 
 Material.prototype.get_sub_forms = function() {
@@ -267,6 +277,8 @@ Material.prototype.task_finish = function(obj, url, task_name) {
                 $(obj).prev().addClass('disabled');
                 self.update_task_info(obj, result.status);
             }
+        }).fail(function(result) {
+            alert(result.responseJSON.detail);
         });
     }
 };
@@ -282,6 +294,8 @@ Material.prototype.task_skip = function(obj, url, task_name) {
                 $(obj).next().addClass('disabled');
                 self.update_task_info(obj, result.status);
             }
+        }).fail(function(result) {
+            alert(result.responseJSON.detail);
         });
     }
 };
@@ -297,11 +311,23 @@ Material.prototype.contract_cancel = function(obj, url) {
                 $(obj).next().addClass('disabled');
                 self.update_task_info(obj, result.status);
             }
+        }).fail(function(result) {
+            alert(result.responseJSON.detail);
         });
     }
 };
 
 Material.prototype.update_task_info = function(obj, status) {
+    var self = this;
+    self.set_task_status($(obj).closest('li'), status);
+    // 進捗を更新する。
+    var total = $(obj).closest('ul.collapsible').find('li').length;
+    var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;
+    $(obj).closest('div.card-content').find('span.percentage').text(Math.round((count/total) * 1000) / 10);
+    $(obj).closest('div.card-content').find('.determinate').css('width', Math.round((count/total) * 1000) / 10 + '%');
+}
+
+Material.prototype.set_task_status = function(liObj, status) {
     var name, color;
     if (status === '99') {
         name = '完了';
@@ -309,12 +335,10 @@ Material.prototype.update_task_info = function(obj, status) {
     } else if (status === '10') {
         name = 'スキップ';
         color = 'grey';
+    } else if (status === '02') {
+        name = '実施中';
+        color = 'purple';
     }
-    $(obj).closest('li').find('.badge').addClass(color);
-    $(obj).closest('li').find('.badge').attr('data-badge-caption', name);
-    // 進捗を更新する。
-    var total = $(obj).closest('ul.collapsible').find('li').length;
-    var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;
-    $(obj).closest('div.card-content').find('span.percentage').text(Math.round((count/total) * 1000) / 10);
-    $(obj).closest('div.card-content').find('.determinate').css('width', Math.round((count/total) * 1000) / 10 + '%');
+    $(liObj).find('.badge').addClass(color);
+    $(liObj).find('.badge').attr('data-badge-caption', name);
 }

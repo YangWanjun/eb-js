@@ -50,7 +50,8 @@ Utils.prototype.ajax_request = function(url, method, params) {
         type: method,
         url: url,
         data: params,
-        dataType: "json"
+        dataType: "json",
+        async: false
     });
 };
 
