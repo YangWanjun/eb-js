@@ -14,4 +14,12 @@ EBJS.prototype.material = new Material();
 EBJS.prototype.gmap = new gMap();
 EBJS.prototype.config = config;
 
+$(window.document).ready(function() {
+    $(".change_comment").closest('td').find('input[type=file]').change(function(){
+        var objComment = $(this).closest('tr[data-formset-form]').find('td.field-comment input[type=text]');
+        var name = utils.getFileNameWithoutExt(this.value);
+        objComment.val(name);
+        objComment.addClass('active');
+    });
+});
 window.ebjs = new EBJS();

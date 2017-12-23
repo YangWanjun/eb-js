@@ -145,6 +145,31 @@ Utils.prototype.getTableColCount = function(tbl_id) {
         count = 0;
     }
     return count;
-}
+};
+
+/**
+ * ファイルのフルパスからファイル名を取得する
+ * @param {*} path 
+ */
+Utils.prototype.getFileName = function(path) {
+    if (path) {
+        return path.split(/([/\\])/).pop();
+    } else {
+        return '';
+    }
+};
+
+/**
+ * ファイルのフルパスからファイル名を取得する
+ * @param {*} name 
+ */
+Utils.prototype.getFileNameWithoutExt = function(path) {
+    var name = this.getFileName(path);
+    if (name) {
+        return name.split(/(\.)/)[0];
+    } else {
+        return '';
+    }
+};
 
 module.exports = new Utils();
