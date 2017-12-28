@@ -192,6 +192,12 @@ Material.prototype.popup_anchor = function() {
     });
 };
 
+Material.prototype.required_field = function() {
+    $("input[required]").each(function(i, obj) {
+        $('label[for=' + obj.id + ']').append('<span class="red-text">*</span>');
+    });
+};
+
 Material.prototype.reflection_form_errors = function(form_obj, error_list) {
     $(".invalid").removeClass('invalid');
     $(form_obj).find('div.errors').remove();
