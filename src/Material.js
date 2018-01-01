@@ -331,7 +331,7 @@ Material.prototype.update_task_info = function(obj, status) {
     var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;
     $(obj).closest('div.card-content').find('span.percentage').text(Math.round((count/total) * 1000) / 10);
     $(obj).closest('div.card-content').find('.determinate').css('width', Math.round((count/total) * 1000) / 10 + '%');
-}
+};
 
 Material.prototype.set_task_status = function(liObj, status) {
     var name, color;
@@ -347,4 +347,13 @@ Material.prototype.set_task_status = function(liObj, status) {
     }
     $(liObj).find('.badge').addClass(color);
     $(liObj).find('.badge').attr('data-badge-caption', name);
-}
+};
+
+Material.prototype.reset_mce_data_href = function() {
+    if ($('div.mce-container iframe').length > 0) {
+        $('div.mce-container iframe').contents().find('a').each(function(index, ancher) {
+            var href = $(ancher).attr('href');
+            $(ancher).attr('data-mce-href', href);
+        });
+    }
+};
