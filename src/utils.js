@@ -84,8 +84,12 @@ Utils.prototype.isNumeric = function(num) {
 };
 
 Utils.prototype.toNumComma = function(num) {
-    int_comma = (num + "").replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-    return int_comma;
+    if (num) {
+        int_comma = (num + "").replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        return int_comma;
+    } else {
+        return '';
+    }
 };
 
 Utils.prototype.loading = function() {

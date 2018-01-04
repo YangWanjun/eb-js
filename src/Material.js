@@ -357,3 +357,69 @@ Material.prototype.reset_mce_data_href = function() {
         });
     }
 };
+
+Material.prototype.expand_parking_lot = function(obj, code) {
+    var self = this;
+    self.collapse_all_parking_lot();
+    var tr = $(obj).closest('tr');
+    var td = $(obj).closest('td');
+    var col_count = tr.children().length;
+    utils.ajax_get(
+        config.setting.api_size_grouped_positions, 
+        {code: code}
+    ).done(function(result) {
+        td.html('<a href="javascript:void(0)"><i class="small material-icons">expand_less</i></a>');
+        $('a', td).click(function() { 
+            self.collapse_all_parking_lot();
+            self.collapse_parking_lot(td, code); 
+        });
+        var newRow = $.parseHTML('<tr class="appended-positions"><td colspan="' + col_count + '"></td></tr>');
+        var headHtml = '<table><thead><tr>' + 
+        '<th>全長</th><th>全幅</th><th>全高</th><th>重量</th>' +
+        '<th>募集賃料（税込）</th>' +
+        '<th>募集賃料（税抜）</th>' +
+        '<th>ＨＰ価格（税込）</th>' +
+        '<th>ＨＰ価格（税抜）</th>' +
+        '<th>チラシ価格（税込）</th>' +
+        '<th>チラシ価格（税別）</th>' +
+        '</tr></thead><tbody></tbody></table>';
+        var tbl = $.parseHTML(headHtml);
+        $.each(result, function(i, position) {
+            $('tbody', tbl).append('<tr>' + 
+            '<td>' + utils.toNumComma(position.length) + '</td>' +
+            '<td>' + utils.toNumComma(position.width) + '</td>' +
+            '<td>' + utils.toNumComma(position.height) + '</td>' +
+            '<td>' + utils.toNumComma(position.weight) + '</td>' +
+            '<td>' + utils.toNumComma(position.price_recruitment) + '</td>' +
+            '<td>' + utils.toNumComma(position.price_recruitment_no_tax) + '</td>' +
+            '<td>' + utils.toNumComma(position.price_homepage) + '</td>' +
+            '<td>' + utils.toNumComma(position.price_homepage_no_tax) + '</td>' +
+            '<td>' + utils.toNumComma(position.price_handbill) + '</td>' +
+            '<td>' + utils.toNumComma(position.price_handbill_no_tax) + '</td>' +
+            '</tr>');
+        });
+        $(newRow).find('td').append(tbl);
+        tr.after(newRow);
+    }).fail(function(result) {
+        debugger;
+    }).always(function(result){
+        // debugger;
+    });
+};
+
+Material.prototype.collapse_all_parking_lot = function() {
+    var self = this;
+    $('tr.appended-positions').each(function(i, tr) {
+        var code = $(tr).prev().children().first().text();
+        self.collapse_parking_lot($(tr).prev().children().last(), code);
+        $(tr).remove();
+    });
+};
+
+Material.prototype.collapse_parking_lot = function(cell, code) {
+    var self = this;
+    $(cell).html('<a href="javascript:void(0)"><i class="small material-icons">expand_more</i></a>');
+    $(cell).find('a').click(function() {
+        self.expand_parking_lot(cell, code);
+    });
+};
