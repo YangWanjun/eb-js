@@ -9,6 +9,7 @@ $(document).ready(function () {
                 if (param_name && field_id && $("#" + field_id).val() != "") {
                     ajax_url = ajax_url + param_name + '=' + $("#" + field_id).val() + "&";
                 }
+                // 名前を選択され、ＩＤをHiddenFieldに格納する場合はそのHiddenFieldのＩＤを指定する。
                 var target_id = $(self).attr('eb-autocomplete-target-id');
                 var related_fields = $(self).attr('eb-autocomplete-related-fields');
 
@@ -18,7 +19,7 @@ $(document).ready(function () {
                             url: ajax_url + "search=" + encodeURIComponent(req.term),
                             dataType: "json",
                             success: function( data ) {
-                                res(data.results);
+                                res(data);
                             }
                         });
                     },

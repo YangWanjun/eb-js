@@ -14,6 +14,8 @@ EBJS.prototype.material = new Material();
 EBJS.prototype.gmap = new gMap();
 EBJS.prototype.config = config;
 
+window.ebjs = new EBJS();
+
 $(window.document).ready(function() {
     $(".change_comment").closest('td').find('input[type=file]').change(function(){
         var objComment = $(this).closest('tr[data-formset-form]').find('td.field-comment input[type=text]');
@@ -22,4 +24,3 @@ $(window.document).ready(function() {
         objComment.addClass('active');
     });
 });
-window.ebjs = new EBJS();

@@ -375,17 +375,22 @@ Material.prototype.expand_parking_lot = function(obj, code) {
         });
         var newRow = $.parseHTML('<tr class="appended-positions"><td colspan="' + col_count + '"></td></tr>');
         var headHtml = '<table><thead><tr>' + 
+        '<th>車室</th>' +
+        '<th>数量</th>' +
         '<th>全長</th><th>全幅</th><th>全高</th><th>重量</th>' +
-        '<th>募集賃料（税込）</th>' +
-        '<th>募集賃料（税抜）</th>' +
-        '<th>ＨＰ価格（税込）</th>' +
-        '<th>ＨＰ価格（税抜）</th>' +
-        '<th>チラシ価格（税込）</th>' +
-        '<th>チラシ価格（税別）</th>' +
+        '<th>募集(込)</th>' +
+        '<th>募集(抜)</th>' +
+        '<th>ＨＰ(込)</th>' +
+        '<th>ＨＰ(抜)</th>' +
+        '<th>ﾁﾗｼ(込)</th>' +
+        '<th>ﾁﾗｼ(抜)</th>' +
+        '<th>空き</th>' +
         '</tr></thead><tbody></tbody></table>';
         var tbl = $.parseHTML(headHtml);
         $.each(result, function(i, position) {
             $('tbody', tbl).append('<tr>' + 
+            '<td>' + self.combine_parking_position(position.sub_positions) + '</td>' +
+            '<td>' + utils.toNumComma(position.count) + '</td>' +
             '<td>' + utils.toNumComma(position.length) + '</td>' +
             '<td>' + utils.toNumComma(position.width) + '</td>' +
             '<td>' + utils.toNumComma(position.height) + '</td>' +
@@ -396,6 +401,7 @@ Material.prototype.expand_parking_lot = function(obj, code) {
             '<td>' + utils.toNumComma(position.price_homepage_no_tax) + '</td>' +
             '<td>' + utils.toNumComma(position.price_handbill) + '</td>' +
             '<td>' + utils.toNumComma(position.price_handbill_no_tax) + '</td>' +
+            '<td>' + self.get_contract_status_html(position.status) + '</td>' +
             '</tr>');
         });
         $(newRow).find('td').append(tbl);
@@ -405,6 +411,35 @@ Material.prototype.expand_parking_lot = function(obj, code) {
     }).always(function(result){
         // debugger;
     });
+};
+
+/**
+ * 車室のリストをHTMLのAnchorで結合する。
+ * @param {Array} positions 
+ */
+Material.prototype.combine_parking_position = function(positions) {
+    var html = '';
+    if (positions && positions.length > 0) {
+        $.each(positions, function(i, obj) {
+            var url = utils.format(config.setting.format_parking_position_url, obj.id);
+            var class_name = '';
+            if (obj.status == '01') {
+                // 空き
+                class_name = 'green-text';
+            } else if (obj.status == '02') {
+                // 手続中
+                class_name = 'deep-orange-text';
+            } else if (obj.status == '03') {
+                // 空無
+                class_name = 'grey-text';
+            } else if (obj.status == '04') {
+                // 仮押さえ
+                class_name = 'blue-text';
+            }
+            html += '<a class="' + class_name + '" style="margin:0px 3px;" href="' + url + '">' + obj.name + '</a>';
+        });
+    }
+    return html;
 };
 
 Material.prototype.collapse_all_parking_lot = function() {
@@ -422,4 +457,114 @@ Material.prototype.collapse_parking_lot = function(cell, code) {
     $(cell).find('a').click(function() {
         self.expand_parking_lot(cell, code);
     });
+};
+
+/**
+ * 電話で問い合わせたユーザー情報をlocalStorageに保存
+ */
+Material.prototype.save_user_info = function() {
+    var self = this;
+    $('div.local-storage input,div.local-storage textarea').each(function(i, obj) {
+        $(obj).change(function() {
+            self.save_value(obj);
+        });
+    });
+};
+
+Material.prototype.save_value = function(obj) {
+    var self = this;
+    var user_info = self.get_user_info();
+    var ele_id = $(obj).attr('id');
+    if ($(obj).attr('type') == 'checkbox') {
+        user_info[ele_id] = $(obj).is(':checked');
+    } else {
+        user_info[ele_id] = $(obj).val();
+        // HiddenFieldの項目がある場合、その値も設定する。
+        var target_id = $("#" + ele_id).attr('eb-autocomplete-target-id');
+        if (target_id) {
+            user_info[target_id] = $("#" + target_id).val();
+        }
+    }
+    localStorage.setItem('user_info', JSON.stringify(user_info));
+};
+
+/**
+ * localStorageから保存されたユーザー情報を取得する。
+ */
+Material.prototype.get_user_info = function() {
+    return JSON.parse(localStorage.getItem('user_info')) || {};
+};
+
+/**
+ * 電話で問い合わせたユーザー情報を反映する。
+ */
+Material.prototype.load_user_info = function() {
+    var self = this;
+    var user_info = self.get_user_info();
+    if (user_info) {
+        $.each(Object.keys(user_info), function(i, key) {
+            var value = user_info[key];
+            if (value === true) {
+                $("#" + key).prop('checked', true);
+            } else if (value === false) {
+                $("#" + key).prop('checked', false);
+            } else {
+                $("#" + key).next().addClass('active');
+                $("#" + key).val(value);
+            }
+        });
+    }
+};
+
+/**
+ * ユーザー情報をlocalStorageから削除する。
+ */
+Material.prototype.clear_user_info = function() {
+    var self = this;
+    $('div.local-storage input,div.local-storage textarea').each(function(i, obj) {
+        if ($(obj).attr('type') == 'checkbox') {
+            $(obj).prop('checked', false);
+        } else {
+            $(obj).val('');
+            $(obj).next().removeClass('active');
+            // HiddenFieldの項目がある場合、その値も設定する。
+            var target_id = $(obj).attr('eb-autocomplete-target-id');
+            if (target_id) {
+                $("#" + target_id).val('');
+            }
+        }    
+    });
+    localStorage.removeItem('user_info');
+};
+
+/**
+ * ユーザー情報によって、駐車場を自動マッチする。
+ */
+Material.prototype.match_parking_lot = function(datatable) {
+    var self = this;
+    var user_info = self.get_user_info();
+    if (user_info) {
+        if (user_info.id_parking_lot) {
+            datatable.search( user_info.id_parking_lot ).draw();
+        }
+    }
+}
+
+/**
+ * 契約状態のbadgeを取得する
+ * @param {string} status 
+ */
+Material.prototype.get_contract_status_html = function(status) {
+    if (status === '01') {
+        html = '<span class="new badge left green" data-badge-caption="空き" style="margin-left: 0px;"></span>';
+    } else if (status === '02') {
+        html = '<span class="new badge left deep-orange" data-badge-caption="手続中" style="margin-left: 0px;"></span>';
+    } else if (status === '03') {
+        html = '<span class="new badge left grey" data-badge-caption="空無" style="margin-left: 0px;"></span>';
+    } else if (status === '04') {
+        html = '<span class="new badge left blue" data-badge-caption="仮押" style="margin-left: 0px;"></span>';
+    } else {
+        html = status;
+    }
+    return html;
 };
