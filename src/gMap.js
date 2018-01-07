@@ -9,12 +9,66 @@ module.exports = gMap = function() {
 gMap.prototype.init = function (map_id, options) {
     var self = this;
     self.options = options || {};
-    loadGoogleMapsAPI({ key: 'AIzaSyBjzwjBMykNJikl12HQOuWsYxMmozvkhVU' }).then(function (googleMaps) {
+    loadGoogleMapsAPI({ key: 'AIzaSyBjzwjBMykNJikl12HQOuWsYxMmozvkhVU', libraries: ['places'] }).then(function (googleMaps) {
         gmap = new googleMaps.Map(document.getElementById(map_id), {
             center: new googleMaps.LatLng(config.map.center.lat, config.map.center.lng),
             scaleControl: true,
             minZoom: config.map.minZoom,
             zoom: config.map.zoom
+        });
+
+        // 住所検索
+        var input = document.getElementById('pac-input');
+        var searchBox = new googleMaps.places.SearchBox(input);
+        gmap.controls[googleMaps.ControlPosition.TOP_LEFT].push(input);
+        gmap.addListener('bounds_changed', function () {
+            searchBox.setBounds(gmap.getBounds());
+        });
+        var markers = [];
+        searchBox.addListener('places_changed', function () {
+            var places = searchBox.getPlaces();
+
+            if (places.length == 0) {
+                return;
+            }
+
+            // Clear out the old markers.
+            markers.forEach(function (marker) {
+                marker.setMap(null);
+            });
+            markers = [];
+
+            // For each place, get the icon, name and location.
+            var bounds = new googleMaps.LatLngBounds();
+            places.forEach(function (place) {
+                if (!place.geometry) {
+                    console.log("Returned place contains no geometry");
+                    return;
+                }
+                var icon = {
+                    url: place.icon,
+                    size: new googleMaps.Size(71, 71),
+                    origin: new googleMaps.Point(0, 0),
+                    anchor: new googleMaps.Point(17, 34),
+                    scaledSize: new googleMaps.Size(25, 25)
+                };
+
+                // Create a marker for each place.
+                markers.push(new googleMaps.Marker({
+                    map: gmap,
+                    icon: icon,
+                    title: place.name,
+                    position: place.geometry.location
+                }));
+
+                if (place.geometry.viewport) {
+                    // Only geocodes have viewport.
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
+            });
+            gmap.fitBounds(bounds);
         });
 
         self.map = gmap;
@@ -57,7 +111,7 @@ gMap.prototype.CreateLayers = function (){
         var id_radius = "txtRadius" + event.feature.getProperty('parking_lot');
         var id_clear_circles = "btnClear" + event.feature.getProperty('parking_lot');
         // InfoWindow内のの内容
-        var content = '<b>' + event.feature.getProperty('parking_lot_name') + '</b><br/>' + 
+        var content = '<b>' + event.feature.getProperty('name') + '</b><br/>' + 
             '所在地：' + event.feature.getProperty('address') + '<br/>' + 
             '担当者：' + event.feature.getProperty('staff_name') + '<br/>' + 
             '車室数：' + event.feature.getProperty('position_count') + '<br/>' + 
