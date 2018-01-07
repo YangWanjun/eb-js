@@ -16,7 +16,9 @@ module.exports = Config = {
         // ダイアログのタイムアウト時間（10秒）
         toast_timeout: 10000,               
         // ホワイトボードで駐車場を展開時、車室を取得するＡＰＩのＵＲＬ
-        api_size_grouped_positions: 'http://ap.mopa.jp/api/parking-position-size-grouped/',
+        api_size_grouped_positions: '/api/parking-position-size-grouped/',
+        // ユーザー問い合わせ履歴保存
+        api_add_inquiry: '/api/inquiry/',
         // 車室詳細のＵＲＬフォーマット
         format_parking_position_url: '/whiteboard/whiteboard-position-%s.html'
     },

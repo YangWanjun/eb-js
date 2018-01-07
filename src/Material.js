@@ -464,13 +464,17 @@ Material.prototype.collapse_parking_lot = function(cell, code) {
  */
 Material.prototype.save_user_info = function() {
     var self = this;
-    $('div.local-storage input,div.local-storage textarea').each(function(i, obj) {
+    $('div.local-storage input,div.local-storage textarea,div.local-storage select').each(function(i, obj) {
         $(obj).change(function() {
             self.save_value(obj);
         });
     });
 };
 
+/**
+ * INPUT項目のユーザー情報を保存する
+ * @param {element} obj 
+ */
 Material.prototype.save_value = function(obj) {
     var self = this;
     var user_info = self.get_user_info();
@@ -538,14 +542,37 @@ Material.prototype.clear_user_info = function() {
 };
 
 /**
+ * 問い合わせ情報を履歴に保存する
+ */
+Material.prototype.save_inquiry = function(obj) {
+    var self = this;
+    if ($(obj).hasClass('eb-disabled')) {
+        return false;
+    } else {
+        var user_info = self.get_user_info();
+        if (user_info) {
+            console.log(user_info);
+            utils.ajax_post(
+                config.setting.api_add_inquiry,
+                user_info
+            ).done(function(result){
+                Materialize.toast('問い合わせ履歴を保存しました。', config.setting.toast_timeout);
+            }).fail(function(result) {
+                console.log(result.responseJSON);
+            });
+        }
+    }
+};
+
+/**
  * ユーザー情報によって、駐車場を自動マッチする。
  */
 Material.prototype.match_parking_lot = function(datatable) {
     var self = this;
     var user_info = self.get_user_info();
     if (user_info) {
-        if (user_info.id_parking_lot) {
-            datatable.search( user_info.id_parking_lot ).draw();
+        if (user_info.parking_lot_name) {
+            datatable.search( user_info.parking_lot_name ).draw();
         }
     }
 }
