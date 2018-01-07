@@ -373,37 +373,8 @@ Material.prototype.expand_parking_lot = function(obj, code) {
             self.collapse_all_parking_lot();
             self.collapse_parking_lot(td, code); 
         });
+        var tbl = self.get_expanded_positions_html(result);
         var newRow = $.parseHTML('<tr class="appended-positions"><td colspan="' + col_count + '"></td></tr>');
-        var headHtml = '<table><thead><tr>' + 
-        '<th>車室</th>' +
-        '<th>数量</th>' +
-        '<th>全長</th><th>全幅</th><th>全高</th><th>重量</th>' +
-        '<th>募集(込)</th>' +
-        '<th>募集(抜)</th>' +
-        '<th>ＨＰ(込)</th>' +
-        '<th>ＨＰ(抜)</th>' +
-        '<th>ﾁﾗｼ(込)</th>' +
-        '<th>ﾁﾗｼ(抜)</th>' +
-        '<th>空き</th>' +
-        '</tr></thead><tbody></tbody></table>';
-        var tbl = $.parseHTML(headHtml);
-        $.each(result, function(i, position) {
-            $('tbody', tbl).append('<tr>' + 
-            '<td>' + self.combine_parking_position(position.sub_positions) + '</td>' +
-            '<td>' + utils.toNumComma(position.count) + '</td>' +
-            '<td>' + utils.toNumComma(position.length) + '</td>' +
-            '<td>' + utils.toNumComma(position.width) + '</td>' +
-            '<td>' + utils.toNumComma(position.height) + '</td>' +
-            '<td>' + utils.toNumComma(position.weight) + '</td>' +
-            '<td>' + utils.toNumComma(position.price_recruitment) + '</td>' +
-            '<td>' + utils.toNumComma(position.price_recruitment_no_tax) + '</td>' +
-            '<td>' + utils.toNumComma(position.price_homepage) + '</td>' +
-            '<td>' + utils.toNumComma(position.price_homepage_no_tax) + '</td>' +
-            '<td>' + utils.toNumComma(position.price_handbill) + '</td>' +
-            '<td>' + utils.toNumComma(position.price_handbill_no_tax) + '</td>' +
-            '<td>' + self.get_contract_status_html(position.status) + '</td>' +
-            '</tr>');
-        });
         $(newRow).find('td').append(tbl);
         tr.after(newRow);
     }).fail(function(result) {
@@ -412,6 +383,46 @@ Material.prototype.expand_parking_lot = function(obj, code) {
         // debugger;
     });
 };
+
+/**
+ * 駐車場コードによって取得した車室をHTMLのTableに返す
+ * @param {Array} result 
+ */
+Material.prototype.get_expanded_positions_html = function(result) {
+    var self = this;
+    var headHtml = '<table><thead><tr>' + 
+    '<th>車室</th>' +
+    '<th>数量</th>' +
+    '<th>全長</th><th>全幅</th><th>全高</th><th>重量</th>' +
+    '<th>募集(込)</th>' +
+    '<th>募集(抜)</th>' +
+    '<th>ＨＰ(込)</th>' +
+    '<th>ＨＰ(抜)</th>' +
+    '<th>ﾁﾗｼ(込)</th>' +
+    '<th>ﾁﾗｼ(抜)</th>' +
+    '<th>空き</th>' +
+    '</tr></thead><tbody></tbody></table>';
+    var tbl = $.parseHTML(headHtml);
+    $.each(result, function(i, position) {
+        $('tbody', tbl).append('<tr>' + 
+        '<td>' + self.combine_parking_position(position.sub_positions) + '</td>' +
+        '<td>' + utils.toNumComma(position.count) + '</td>' +
+        '<td>' + utils.toNumComma(position.length) + '</td>' +
+        '<td>' + utils.toNumComma(position.width) + '</td>' +
+        '<td>' + utils.toNumComma(position.height) + '</td>' +
+        '<td>' + utils.toNumComma(position.weight) + '</td>' +
+        '<td>' + utils.toNumComma(position.price_recruitment) + '</td>' +
+        '<td>' + utils.toNumComma(position.price_recruitment_no_tax) + '</td>' +
+        '<td>' + utils.toNumComma(position.price_homepage) + '</td>' +
+        '<td>' + utils.toNumComma(position.price_homepage_no_tax) + '</td>' +
+        '<td>' + utils.toNumComma(position.price_handbill) + '</td>' +
+        '<td>' + utils.toNumComma(position.price_handbill_no_tax) + '</td>' +
+        '<td>' + self.get_contract_status_html(position.status) + '</td>' +
+        '</tr>');
+    });
+
+    return tbl;
+}
 
 /**
  * 車室のリストをHTMLのAnchorで結合する。
@@ -436,7 +447,7 @@ Material.prototype.combine_parking_position = function(positions) {
                 // 仮押さえ
                 class_name = 'blue-text';
             }
-            html += '<a class="' + class_name + '" style="margin:0px 3px;" href="' + url + '">' + obj.name + '</a>';
+            html += '<a class="' + class_name + '" data-turbolinks="false" style="margin:0px 3px;" href="' + url + '">' + obj.name + '</a>';
         });
     }
     return html;

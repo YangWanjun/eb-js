@@ -90,9 +90,8 @@ gMap.prototype.CreateLayers = function (){
     });
     // スタイルの設定
     self.map.data.setStyle(function(feature) {
-        var position_count = feature.getProperty('position_count');     // 車室数
-        var contract_count = feature.getProperty('contract_count');     // 契約数
-        var icon_url = position_count === contract_count ? 'https://maps.multisoup.co.jp/exsample/common/img/ms/pin_04.png' : 'https://maps.multisoup.co.jp/exsample/common/img/ms/pin_01.png';
+        var empty_count = feature.getProperty('empty_count');     // 空きの車室数
+        var icon_url = empty_count > 0 ? 'https://maps.multisoup.co.jp/exsample/common/img/ms/pin_01.png' : 'https://maps.multisoup.co.jp/exsample/common/img/ms/pin_04.png';
         return ({
             icon: {
                 url:  icon_url,
@@ -107,18 +106,24 @@ gMap.prototype.CreateLayers = function (){
     self.map.data.addListener('click', function(event) {
         // 表示位置
         infoWindow.setPosition(event.latLng);
+        var code = event.feature.getId();
         var id_create_circle = "btnCircle" + event.feature.getProperty('parking_lot');
         var id_radius = "txtRadius" + event.feature.getProperty('parking_lot');
         var id_clear_circles = "btnClear" + event.feature.getProperty('parking_lot');
+        var staff = event.feature.getProperty('staff');
+        var staff_name = '';
+        if (staff) {
+            staff_name = staff.full_name;
+        }
         // InfoWindow内のの内容
-        var content = '<b>' + event.feature.getProperty('name') + '</b><br/>' + 
-            '所在地：' + event.feature.getProperty('address') + '<br/>' + 
-            '担当者：' + event.feature.getProperty('staff_name') + '<br/>' + 
-            '車室数：' + event.feature.getProperty('position_count') + '<br/>' + 
-            '空き数：' + event.feature.getProperty('contract_count') + '<br/>' +
-            '既契約者：' + event.feature.getProperty('is_existed_contractor_allowed') + '<br/>' + 
-            '新テナント：' + event.feature.getProperty('is_new_contractor_allowed') + '<br/>' + 
-            'フリーレント終了日：' + (event.feature.getProperty('free_end_date') || '') + '<br/>';
+        var content = '<a class="modal-trigger" code="' + code + '" href="#parking_details"><b>' + event.feature.getProperty('name') + '</b></a><br/>';
+        content += '所在地：' + event.feature.getProperty('address') + '<br/>';
+        content += '担当者：' + staff_name + '<br/>';
+        content += '車室数：' + event.feature.getProperty('position_count') + '<br/>';
+        content += '空き数：' + event.feature.getProperty('empty_count') + '<br/>';
+        content += '既契約者：' + event.feature.getProperty('is_existed_contractor_allowed') + '<br/>';
+        content += '新テナント：' + event.feature.getProperty('is_new_contractor_allowed') + '<br/>';
+        content += 'フリーレント終了日：' + (event.feature.getProperty('free_end_date') || '') + '<br/>';
         content += '半径：<input type="text" id="' + id_radius + '" class="browser-default-radius" />m&nbsp;';
         content += '<button id="' + id_create_circle + '">作成</button>'
         content += '<a id="' + id_clear_circles + '">クリア</a>'
