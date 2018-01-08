@@ -19,7 +19,7 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin(['dist', '/workspace/areaparking/static/js']),
+    new CleanWebpackPlugin(['dist']),
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
@@ -35,8 +35,7 @@ module.exports = {
   ],
   output: {
     filename: './bundle.js',
-    //path: path.resolve(__dirname, 'dist')
-    path: '/workspace/areaparking/static/js',
+    path: path.resolve(__dirname, '../areaparking/static/js')
   },
   module: {
     rules: [
