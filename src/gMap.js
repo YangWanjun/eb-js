@@ -9,7 +9,7 @@ module.exports = gMap = function() {
 gMap.prototype.init = function (map_id, options) {
     var self = this;
     self.options = options || {};
-    loadGoogleMapsAPI({ key: 'AIzaSyBjzwjBMykNJikl12HQOuWsYxMmozvkhVU', libraries: ['places'] }).then(function (googleMaps) {
+    loadGoogleMapsAPI({ key: 'AIzaSyBjzwjBMykNJikl12HQOuWsYxMmozvkhVU', libraries: ['places', 'drawing'] }).then(function (googleMaps) {
         gmap = new googleMaps.Map(document.getElementById(map_id), {
             center: new googleMaps.LatLng(config.map.center.lat, config.map.center.lng),
             scaleControl: true,
@@ -69,6 +69,43 @@ gMap.prototype.init = function (map_id, options) {
                 }
             });
             gmap.fitBounds(bounds);
+        });
+        // ポリゴン描画
+        var drawingManager = new googleMaps.drawing.DrawingManager({
+            // drawingMode: googleMaps.drawing.OverlayType.MARKER,
+            drawingControl: true,
+            drawingControlOptions: {
+                position: googleMaps.ControlPosition.BOTTOM_LEFT,
+                drawingModes: ['marker', 'circle', 'polyline']
+            },
+            // markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+            circleOptions: {
+                // fillColor: '#ffff00',
+                // fillOpacity: 1,
+                // strokeWeight: 5,
+                clickable: false,
+                editable: true,
+                zIndex: 1
+            }
+        });
+        drawingManager.setMap(gmap);
+        googleMaps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
+            if (event.type == 'circle') {
+                var radius = event.overlay.getRadius();
+            } else if (event.type == 'polyline') {
+                var lines = event.overlay.getPath();
+                var distance = 0;
+                for (var i=1; i<lines.length; i++) {
+                    distance += googleMaps.geometry.spherical.computeDistanceBetween(lines.getAt(i - 1), lines.getAt(i));
+                }
+                distance = Math.round(distance);
+                console.log(distance);
+                var label = new Label({
+                    map: gmap,
+                    text: distance
+                });
+                label.bindTo('position', event.overlay, 'position');
+            }
         });
 
         self.map = gmap;
@@ -161,3 +198,63 @@ gMap.prototype.CreateCircle = function(lng, lat, radius) {
     });
     self.circles.push(c);
 };
+
+// // Define the overlay, derived from google.maps.OverlayView
+// gMap.prototype.Label = function(opt_options) {
+//     // Initialization
+//     this.setValues(opt_options);
+
+//     // Label specific
+//     var span = this.span_ = document.createElement('span');
+//     span.style.cssText = 'position: relative; left: -50%; top: -8px; ' +
+//       'white-space: nowrap; border: 1px solid blue; ' +
+//       'padding: 2px; background-color: white';
+
+//     var div = this.div_ = document.createElement('div');
+//     div.appendChild(span);
+//     div.style.cssText = 'position: absolute; display: none';
+// };
+
+// gMap.prototype.Label.prototype = new google.maps.OverlayView;
+  
+// // Implement onAdd
+// gMap.prototype.Label.prototype.onAdd = function() {
+//     var pane = this.getPanes().overlayLayer;
+//     pane.appendChild(this.div_);
+  
+//     // Ensures the label is redrawn if the text or position is changed.
+//     var me = this;
+//     this.listeners_ = [
+//       google.maps.event.addListener(this, 'position_changed',
+//         function() {
+//           me.draw();
+//         }),
+//       google.maps.event.addListener(this, 'text_changed',
+//         function() {
+//           me.draw();
+//         })
+//     ];
+// };
+  
+// // Implement onRemove
+// gMap.prototype.Label.prototype.onRemove = function() {
+//     this.div_.parentNode.removeChild(this.div_);
+  
+//     // Label is removed from the map, stop updating its position/text.
+//     for (var i = 0, I = this.listeners_.length; i < I; ++i) {
+//       google.maps.event.removeListener(this.listeners_[i]);
+//     }
+// };
+  
+// // Implement draw
+// gMap.prototype.Label.prototype.draw = function() {
+//     var projection = this.getProjection();
+//     var position = projection.fromLatLngToDivPixel(this.get('position'));
+  
+//     var div = this.div_;
+//     div.style.left = position.x + 'px';
+//     div.style.top = position.y + 'px';
+//     div.style.display = 'block';
+  
+//     this.span_.innerHTML = this.get('text').toString();
+// };

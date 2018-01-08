@@ -391,28 +391,31 @@ Material.prototype.expand_parking_lot = function(obj, code) {
 Material.prototype.get_expanded_positions_html = function(result) {
     var self = this;
     var headHtml = '<table><thead><tr>' + 
-    '<th>車室</th>' +
-    '<th>数量</th>' +
-    '<th>全長</th><th>全幅</th><th>全高</th><th>重量</th>' +
-    '<th>募集(込)</th>' +
-    '<th>募集(抜)</th>' +
-    '<th>ＨＰ(込)</th>' +
-    '<th>ＨＰ(抜)</th>' +
-    '<th>ﾁﾗｼ(込)</th>' +
-    '<th>ﾁﾗｼ(抜)</th>' +
-    '<th>空き</th>' +
+    '<th style="padding-right: 0px;">車室</th>' +
+    '<th style="padding-right: 0px;">数量</th>' +
+    '<th style="padding-right: 0px;">全長</th>' + 
+    '<th style="padding-right: 0px;">全幅</th>' +
+    '<th style="padding-right: 0px;">全高</th>' +
+    '<th style="padding-right: 0px;">重量</th>' +
+    //'<th>募集(込)</th>' +
+    //'<th>募集(抜)</th>' +
+    '<th style="padding-right: 0px;">ＨＰ(込)</th>' +
+    '<th style="padding-right: 0px;">ＨＰ(抜)</th>' +
+    '<th style="padding-right: 0px;">ﾁﾗｼ(込)</th>' +
+    '<th style="padding-right: 0px;">ﾁﾗｼ(抜)</th>' +
+    '<th style="padding-right: 0px;">空き</th>' +
     '</tr></thead><tbody></tbody></table>';
     var tbl = $.parseHTML(headHtml);
     $.each(result, function(i, position) {
         $('tbody', tbl).append('<tr>' + 
-        '<td>' + self.combine_parking_position(position.sub_positions) + '</td>' +
+        '<td style="padding-left: 0;word-break: break-word;">' + self.combine_parking_position(position.sub_positions) + '</td>' +
         '<td>' + utils.toNumComma(position.count) + '</td>' +
         '<td>' + utils.toNumComma(position.length) + '</td>' +
         '<td>' + utils.toNumComma(position.width) + '</td>' +
         '<td>' + utils.toNumComma(position.height) + '</td>' +
         '<td>' + utils.toNumComma(position.weight) + '</td>' +
-        '<td>' + utils.toNumComma(position.price_recruitment) + '</td>' +
-        '<td>' + utils.toNumComma(position.price_recruitment_no_tax) + '</td>' +
+        //'<td>' + utils.toNumComma(position.price_recruitment) + '</td>' +
+        //'<td>' + utils.toNumComma(position.price_recruitment_no_tax) + '</td>' +
         '<td>' + utils.toNumComma(position.price_homepage) + '</td>' +
         '<td>' + utils.toNumComma(position.price_homepage_no_tax) + '</td>' +
         '<td>' + utils.toNumComma(position.price_handbill) + '</td>' +
