@@ -609,3 +609,24 @@ Material.prototype.get_contract_status_html = function(status) {
     }
     return html;
 };
+
+/**
+ * 申込から成約になる
+ * @param {element} obj 
+ */
+Material.prototype.subscription_finish = function(obj) {
+    if (confirm('仮契約を本契約に登録します、よろしいですか？') == true) {
+        utils.ajax_post(
+            obj.href, {}
+        ).done(function(result){
+            if (result.error) {
+                alert(result.message);
+            } else {
+                Materialize.toast('本契約に登録しました', config.setting.toast_timeout);
+                window.location = result.url;
+            }
+        }).fail(function(result) {
+            console.log(result.responseJSON);
+        });
+    }
+};
