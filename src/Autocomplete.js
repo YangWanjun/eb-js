@@ -41,6 +41,10 @@ $(document).ready(function () {
                                 }
                             }
                         }
+                    },
+                    position: {
+                        my : "right top",
+                        at: "right bottom"
                     }
                 });
             }
