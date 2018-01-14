@@ -1,4 +1,7 @@
-$(document).ready(function () {
+module.exports = Autocomplete = function() {
+};
+
+Autocomplete.prototype.init = function() {
     if ($ != null) {
         $(".eb-autocomplete").each(function(index) {
             var self = this;
@@ -40,6 +43,13 @@ $(document).ready(function () {
                                     $("#" + key).next().addClass("active");
                                 }
                             }
+                            if (ui.item.label_value) {
+                                $(this).val(ui.item.label_value);
+                            }
+                            if (ui.item.url) {
+                                // 画面を遷移します。
+                                window.location = ui.item.url;
+                            }
                         }
                     },
                     position: {
@@ -50,4 +60,4 @@ $(document).ready(function () {
             }
         });
     }
-});
+};
