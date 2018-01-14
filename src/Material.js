@@ -390,7 +390,7 @@ Material.prototype.expand_parking_lot = function(obj, code) {
  */
 Material.prototype.get_expanded_positions_html = function(result) {
     var self = this;
-    var headHtml = '<table><thead><tr>' + 
+    var headHtml = '<table class="responsive-table"><thead><tr>' + 
     '<th style="padding-right: 0px;">車室</th>' +
     '<th style="padding-right: 0px;">数量</th>' +
     '<th style="padding-right: 0px;">全長</th>' + 
