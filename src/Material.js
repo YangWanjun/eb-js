@@ -306,6 +306,29 @@ Material.prototype.task_skip = function(obj, url, task_name) {
     }
 };
 
+/**
+ * タスクを未実施の状態に戻ります。
+ * @param {element} obj 
+ * @param {string} url 
+ * @param {string} task_name 
+ */
+Material.prototype.task_undo = function(obj, url, task_name) {
+    var self = this;
+    // タスクを完了とします。
+    if (confirm('「' + task_name + '」のタスクを未実施の状態に戻ります、よろしいですか？') == true) {
+        utils.ajax_put(url, {}).done(function(result) {
+            if (result.status === '01') {
+                Materialize.toast('「' + task_name + '」のタスクは未実施の状態に戻りました。', config.setting.toast_timeout);
+                $(obj).addClass('disabled');
+                $(obj).next().removeClass('disabled');
+                self.update_task_info(obj, result.status);
+            }
+        }).fail(function(result) {
+            alert(result.responseJSON.detail);
+        });
+    }
+};
+
 Material.prototype.contract_cancel = function(obj, url) {
     var self = this;
     // タスクを完了とします。
@@ -331,6 +354,14 @@ Material.prototype.update_task_info = function(obj, status) {
     var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;
     $(obj).closest('div.card-content').find('span.percentage').text(Math.round((count/total) * 1000) / 10);
     $(obj).closest('div.card-content').find('.determinate').css('width', Math.round((count/total) * 1000) / 10 + '%');
+    // 取り消しのボタンを活性化する
+    if (status === '01') {
+        $(obj).closest('div').find('a.task').removeClass('disabled');
+        $(obj).closest('div').find('a.task-undo').addClass('disabled');
+    } else {
+        $(obj).closest('div').find('a.task').addClass('disabled');
+        $(obj).closest('div').find('a.task-undo').removeClass('disabled');
+    }
 };
 
 Material.prototype.set_task_status = function(liObj, status) {
@@ -338,6 +369,9 @@ Material.prototype.set_task_status = function(liObj, status) {
     if (status === '99') {
         name = '完了';
         color = 'grey';
+    } else if (status === '01') {
+        name = '未実施';
+        color = '';
     } else if (status === '10') {
         name = 'スキップ';
         color = 'grey';
@@ -345,6 +379,9 @@ Material.prototype.set_task_status = function(liObj, status) {
         name = '実施中';
         color = 'purple';
     }
+    $(liObj).find('.badge').removeClass('grey');
+    $(liObj).find('.badge').removeClass('red');
+    $(liObj).find('.badge').removeClass('purple');
     $(liObj).find('.badge').addClass(color);
     $(liObj).find('.badge').attr('data-badge-caption', name);
 };
