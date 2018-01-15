@@ -2,8 +2,10 @@ var Signature = require('./Signature');
 var Material = require('./Material');
 require('jquery-ui/ui/widgets/autocomplete');
 require('jquery-table-fixed-header');
+require('jquery-datetimepicker');
 var gMap = require('./gMap');
 var Autocomplete = require('./Autocomplete');
+$.datetimepicker.setLocale('ja');
 
 var EBJS = function () {};
 

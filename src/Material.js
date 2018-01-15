@@ -371,7 +371,7 @@ Material.prototype.set_task_status = function(liObj, status) {
         color = 'grey';
     } else if (status === '01') {
         name = '未実施';
-        color = '';
+        color = 'red';
     } else if (status === '10') {
         name = 'スキップ';
         color = 'grey';
