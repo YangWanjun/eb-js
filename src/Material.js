@@ -227,6 +227,76 @@ Material.prototype.send_subscription_mail = function(frmId, success_fn, failure_
     // frmObj.submit();
 };
 
+/**
+ * タスクにメール送信のイベント
+ * @param {string} frmId 
+ */
+Material.prototype.send_task_mail = function(frmId, success_fn, failure_fn, always_fn) {
+    var self = this;
+    var frmObj = $("#" + frmId);
+    utils.ajax_form(
+        frmObj,
+        function(result) {
+            try {
+                self.mail_sent_success_fn(result, frmObj);
+                if (success_fn) {
+                    success_fn(result);
+                }
+            } catch(e) {
+                console.log(e);
+            }
+        },
+        function(result) {
+            try {
+                self.mail_sent_failure_fn(result, frmObj);
+                if (failure_fn) {
+                    failure_fn(result);
+                }
+            } catch(e) {
+                console.log(e);
+            }
+        },
+        function(result) {
+            try {
+                self.mail_sent_always_fn(result, frmObj);
+                if (always_fn) {
+                    always_fn(result);
+                }
+            } catch(e) {
+                console.log(e);
+            }
+        },
+    );
+};
+
+/**
+ * メール送信成功時
+ * @param {*} result 
+ * @param {*} frmObj 
+ */
+Material.prototype.mail_sent_success_fn = function(result, frmObj) {
+    var self = this;
+    if (result.error) {
+        alert(result.message);
+    } else {
+        Materialize.toast('メール送信しました!', config.setting.toast_timeout);
+        var btnSendMail = $(frmObj).closest('div.collapsible-body').find('a.task-mail');
+        // 進捗更新
+        self.update_task_info(btnSendMail, '99');
+        // 前回送信時間と送信者
+        btnSendMail.closest('li').find('span.updated_date').text(result.updated_date);
+        btnSendMail.closest('li').find('span.updated_user').text(result.updated_user);
+    }
+};
+
+Material.prototype.mail_sent_failure_fn = function(result, frmObj) {
+
+};
+
+Material.prototype.mail_sent_always_fn = function(result, frmObj) {
+
+};
+
 Material.prototype.send_user_subscription = function() {
     var self = this;
     var forms = self.get_sub_forms();
