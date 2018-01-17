@@ -118,10 +118,9 @@ Utils.prototype.resizeCanvas = function (canvas) {
     canvas.getContext("2d").scale(ratio, ratio);
 };
 
-Utils.prototype.autoFixColumns = function(tbl_id) {
+Utils.prototype.autoFixColumns = function(obj) {
     var self = this;
-    var obj = $("#" + tbl_id);
-    var col_count = self.getTableColCount(tbl_id);
+    var col_count = self.getTableColCount(obj);
     var tbl_width = obj.width();
     var col_width = Math.floor(tbl_width / col_count) - 10; // padding: 5px;
     // obj.css('table-layout', 'fixed');
@@ -144,9 +143,8 @@ Utils.prototype.autoFixColumns = function(tbl_id) {
     });
 };
 
-Utils.prototype.getTableColCount = function(tbl_id) {
+Utils.prototype.getTableColCount = function(obj) {
     // テーブルの列数を取得する、colspanも数えて計算する。
-    var obj = $("#" + tbl_id);
     var count = 0;
     if ($("thead tr", obj).length > 0) {
         $("th", $("thead tr", obj).eq(0)).each(function(index, element) {
