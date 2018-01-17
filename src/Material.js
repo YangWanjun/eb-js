@@ -236,34 +236,22 @@ Material.prototype.send_task_mail = function(frmId, success_fn, failure_fn, alwa
     var frmObj = $("#" + frmId);
     utils.ajax_form(
         frmObj,
-        function(result) {
-            try {
-                self.mail_sent_success_fn(result, frmObj);
-                if (success_fn) {
-                    success_fn(result);
-                }
-            } catch(e) {
-                console.log(e);
+        function (result) {
+            self.mail_sent_success_fn(result, frmObj);
+            if (success_fn) {
+                success_fn(result);
             }
         },
-        function(result) {
-            try {
-                self.mail_sent_failure_fn(result, frmObj);
-                if (failure_fn) {
-                    failure_fn(result);
-                }
-            } catch(e) {
-                console.log(e);
+        function (result) {
+            self.mail_sent_failure_fn(result, frmObj);
+            if (failure_fn) {
+                failure_fn(result);
             }
         },
-        function(result) {
-            try {
-                self.mail_sent_always_fn(result, frmObj);
-                if (always_fn) {
-                    always_fn(result);
-                }
-            } catch(e) {
-                console.log(e);
+        function (result) {
+            self.mail_sent_always_fn(result, frmObj);
+            if (always_fn) {
+                always_fn(result);
             }
         },
     );

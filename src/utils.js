@@ -62,17 +62,29 @@ Utils.prototype.ajax_form = function(frmObj, success_fn, failure_fn, always_fn) 
             $(this).attr('action'),
             $(this).attr('method'),
             $(this).serialize()
-        ).done(function(result) {
-            if (success_fn) {
-                success_fn(result);
+        ).done(function (result) {
+            try {
+                if (success_fn) {
+                    success_fn(result);
+                }
+            } catch (e) {
+                console.log(e);
             }
-        }).fail(function(result) {
-            if (failure_fn) {
-                failure_fn(result);
+        }).fail(function (result) {
+            try {
+                if (failure_fn) {
+                    failure_fn(result);
+                }
+            } catch (e) {
+                console.log(e);
             }
-        }).always(function(result){
-            if (always_fn) {
-                always_fn(result);
+        }).always(function (result) {
+            try {
+                if (always_fn) {
+                    always_fn(result);
+                }
+            } catch (e) {
+                console.log(e);
             }
         });
         return false;
