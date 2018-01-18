@@ -725,3 +725,11 @@ Material.prototype.subscription_finish = function(obj) {
         });
     }
 };
+
+/**
+ * メッセージを表示する
+ * @param {string} message 
+ */
+Material.prototype.toast = function(message) {
+    Materialize.toast(message, config.setting.toast_timeout);
+};
