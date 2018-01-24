@@ -665,9 +665,35 @@ Material.prototype.save_inquiry = function(obj) {
                 config.setting.api_add_inquiry,
                 user_info
             ).done(function(result){
-                Materialize.toast('問い合わせ履歴を保存しました。', config.setting.toast_timeout);
+                Materialize.toast(config.message.ADDED_INQUIRY, config.setting.toast_timeout);
             }).fail(function(result) {
                 console.log(result.responseJSON);
+            });
+        }
+    }
+};
+
+/**
+ * 聞き取り情報を空き待ちに登録する。
+ * @param {element} obj 
+ */
+Material.prototype.waiting_from_inquiry = function(obj) {
+    var self = this;
+    if ($(obj).hasClass('eb-disabled')) {
+        return false;
+    } else {
+        $(obj).addClass('eb-disabled');
+        var user_info = self.get_user_info();
+        if (user_info) {
+            console.log(user_info);
+            utils.ajax_post(
+                config.setting.api_add_waiting,
+                user_info
+            ).done(function (result) {
+                Materialize.toast(config.message.ADDED_WAITING, config.setting.toast_timeout);
+            }).fail(function (result) {
+                console.log(result.responseJSON);
+                $(obj).removeClass('eb-disabled');
             });
         }
     }

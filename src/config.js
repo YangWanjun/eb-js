@@ -19,7 +19,13 @@ module.exports = Config = {
         api_size_grouped_positions: '/api/parking-position-size-grouped/',
         // ユーザー問い合わせ履歴保存
         api_add_inquiry: '/api/inquiry/',
+        // 空き待ち登録
+        api_add_waiting: '/api/waiting/',
         // 車室詳細のＵＲＬフォーマット
         format_parking_position_url: '/whiteboard/whiteboard-position-%s.html'
+    },
+    message: {
+        ADDED_INQUIRY: '問い合わせ履歴を保存しました。',
+        ADDED_WAITING: '空き待ちを登録しました。',
     },
 }
