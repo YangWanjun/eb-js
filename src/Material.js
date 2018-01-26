@@ -759,3 +759,33 @@ Material.prototype.subscription_finish = function(obj) {
 Material.prototype.toast = function(message) {
     Materialize.toast(message, config.setting.toast_timeout);
 };
+
+/**
+ * すべて選択／すべて外す
+ * @param {element} obj 
+ */
+Material.prototype.check_all = function(obj, name) {
+    $(obj).click(function() {
+        if ($(this).is(':checked')) {
+            $("input[type=checkbox][name=" + name + "]").prop('checked', true);
+            $("input[type=checkbox][name=" + name + "]").closest('tr').addClass("green-text");
+        } else {
+            $("input[type=checkbox][name=" + name + "]").prop('checked', false);
+            $("input[type=checkbox][name=" + name + "]").closest('tr').removeClass("green-text");
+        }
+    });
+};
+
+/**
+ * 一行のレコードを選択時のイベント
+ * @param {string} name 
+ */
+Material.prototype.check_single = function(name) {
+    $("input[type=checkbox][name=" + name + "]").click(function(){
+        if ($(this).is(':checked')) {
+            $(this).closest('tr').addClass("green-text");
+        } else {
+            $(this).closest('tr').removeClass("green-text");
+        }
+    });
+};
