@@ -463,7 +463,7 @@ Material.prototype.expand_parking_lot = function(obj, code) {
         config.setting.api_size_grouped_positions, 
         {code: code}
     ).done(function(result) {
-        td.html('<a href="javascript:void(0)"><i class="small material-icons">expand_less</i></a>');
+        td.html('<a href="javascript:void(0)"><i class="small material-icons" style="font-size: 22px;">expand_less</i></a>');
         $('a', td).click(function() { 
             self.collapse_all_parking_lot();
             self.collapse_parking_lot(td, code); 
@@ -562,7 +562,7 @@ Material.prototype.collapse_all_parking_lot = function() {
 
 Material.prototype.collapse_parking_lot = function(cell, code) {
     var self = this;
-    $(cell).html('<a href="javascript:void(0)"><i class="small material-icons">expand_more</i></a>');
+    $(cell).html('<a href="javascript:void(0)"><i class="small material-icons" style="font-size: 22px;">expand_more</i></a>');
     $(cell).find('a').click(function() {
         self.expand_parking_lot(cell, code);
     });
