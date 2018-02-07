@@ -460,8 +460,8 @@ Material.prototype.expand_parking_lot = function(obj, code) {
     var td = $(obj).closest('td');
     var col_count = tr.children().length;
     utils.ajax_get(
-        config.setting.api_size_grouped_positions, 
-        {code: code}
+        config.setting.api_whiteboard_positions, 
+        {whiteboard__code: code}
     ).done(function(result) {
         td.html('<a href="javascript:void(0)"><i class="small material-icons" style="font-size: 22px;">expand_less</i></a>');
         $('a', td).click(function() { 
@@ -485,9 +485,8 @@ Material.prototype.expand_parking_lot = function(obj, code) {
  */
 Material.prototype.get_expanded_positions_html = function(result) {
     var self = this;
-    var headHtml = '<table class="responsive-table"><thead><tr>' + 
+    var headHtml = '<table class="table bordered highlight"><thead><tr>' + 
     '<th style="padding-right: 0px;">車室</th>' +
-    '<th style="padding-right: 0px;">数量</th>' +
     '<th style="padding-right: 0px;">全長</th>' + 
     '<th style="padding-right: 0px;">全幅</th>' +
     '<th style="padding-right: 0px;">全高</th>' +
@@ -503,8 +502,7 @@ Material.prototype.get_expanded_positions_html = function(result) {
     var tbl = $.parseHTML(headHtml);
     $.each(result, function(i, position) {
         $('tbody', tbl).append('<tr>' + 
-        '<td style="padding-left: 0;word-break: break-word;">' + self.combine_parking_position(position.sub_positions) + '</td>' +
-        '<td>' + utils.toNumComma(position.count) + '</td>' +
+        '<td style="padding-left: 0;">' + self.combine_parking_position(position) + '</td>' +
         '<td>' + utils.toNumComma(position.length) + '</td>' +
         '<td>' + utils.toNumComma(position.width) + '</td>' +
         '<td>' + utils.toNumComma(position.height) + '</td>' +
@@ -515,9 +513,10 @@ Material.prototype.get_expanded_positions_html = function(result) {
         '<td>' + utils.toNumComma(position.price_homepage_no_tax) + '</td>' +
         '<td>' + utils.toNumComma(position.price_handbill) + '</td>' +
         '<td>' + utils.toNumComma(position.price_handbill_no_tax) + '</td>' +
-        '<td>' + self.get_contract_status_html(position.status) + '</td>' +
+        '<td>' + self.get_contract_status_html(position.position_status) + '</td>' +
         '</tr>');
     });
+    $("tr:last", tbl).css('border-bottom', '0');
 
     return tbl;
 }
@@ -526,27 +525,25 @@ Material.prototype.get_expanded_positions_html = function(result) {
  * 車室のリストをHTMLのAnchorで結合する。
  * @param {Array} positions 
  */
-Material.prototype.combine_parking_position = function(positions) {
+Material.prototype.combine_parking_position = function(position) {
     var html = '';
-    if (positions && positions.length > 0) {
-        $.each(positions, function(i, obj) {
-            var url = utils.format(config.setting.format_parking_position_url, obj.id);
-            var class_name = '';
-            if (obj.status == '01') {
-                // 空き
-                class_name = 'green-text';
-            } else if (obj.status == '02') {
-                // 手続中
-                class_name = 'deep-orange-text';
-            } else if (obj.status == '03') {
-                // 空無
-                class_name = 'grey-text';
-            } else if (obj.status == '04') {
-                // 仮押さえ
-                class_name = 'blue-text';
-            }
-            html += '<a class="' + class_name + '" data-turbolinks="false" style="margin:0px 3px;" href="' + url + '">' + obj.name + '</a>';
-        });
+    if (position) {
+        var url = utils.format(config.setting.format_parking_position_url, position.parking_position);
+        var class_name = '';
+        if (position.position_status == '01') {
+            // 空き
+            class_name = 'green-text';
+        } else if (position.position_status == '02') {
+            // 手続中
+            class_name = 'deep-orange-text';
+        } else if (position.position_status == '03') {
+            // 空無
+            class_name = 'grey-text';
+        } else if (position.position_status == '04') {
+            // 仮押さえ
+            class_name = 'blue-text';
+        }
+        html += '<a class="' + class_name + '" data-turbolinks="false" style="margin:0px 3px;" href="' + url + '">' + position.name + '</a>';
     }
     return html;
 };

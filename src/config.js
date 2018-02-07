@@ -17,6 +17,8 @@ module.exports = Config = {
         toast_timeout: 10000,
         // ホワイトボードで駐車場を展開時、車室を取得するＡＰＩのＵＲＬ
         api_size_grouped_positions: '/api/parking-position-size-grouped/',
+        // ホワイトボードで車室を取得する
+        api_whiteboard_positions: '/api/whiteboard-position/',
         // ユーザー問い合わせ履歴保存
         api_add_inquiry: '/api/inquiry/',
         // 空き待ち登録
