@@ -198,33 +198,32 @@ Material.prototype.required_field = function() {
     });
 };
 
+/**
+ * ajax呼出し後、エラー発生したら、エラーメッセージを表示する。
+ * @param {element} form_obj 
+ * @param {json} error_list 
+ */
 Material.prototype.reflection_form_errors = function(form_obj, error_list) {
-    $(".invalid").removeClass('invalid');
-    $(form_obj).find('div.errors').remove();
-    $.each(Object.keys(error_list), function(index, key) {
-        var obj = $("#id_" + key);
-        if (obj.prop('tagName').toUpperCase() === 'SELECT') {
-            obj.parent().find('input[type=text]').addClass('invalid');
-        } else {
-            obj.addClass('invalid');
-        }
-        var error_elem = $.parseHTML('<div class="errors"></div>');
-        $.each(error_list[key], function(i, msg) {
-            $(error_elem).append('<small class="error">' + msg + '</small>');
+    var self = this;
+    if (error_list.detail) {
+        self.toast_error(error_list.detail);
+    } else {
+        $(".invalid").removeClass('invalid');
+        $(form_obj).find('div.errors').remove();
+        $.each(Object.keys(error_list), function(index, key) {
+            var obj = $("#id_" + key);
+            if (obj.prop('tagName').toUpperCase() === 'SELECT') {
+                obj.parent().find('input[type=text]').addClass('invalid');
+            } else {
+                obj.addClass('invalid');
+            }
+            var error_elem = $.parseHTML('<div class="errors"></div>');
+            $.each(error_list[key], function(i, msg) {
+                $(error_elem).append('<small class="error">' + msg + '</small>');
+            });
+            obj.after(error_elem);
         });
-        obj.after(error_elem);
-    });
-};
-
-Material.prototype.send_subscription_mail = function(frmId, success_fn, failure_fn, always_fn) {
-    var frmObj = $("#" + frmId);
-    utils.ajax_form(
-        frmObj,
-        success_fn,
-        failure_fn,
-        always_fn,
-    )
-    // frmObj.submit();
+    }
 };
 
 /**
@@ -748,18 +747,33 @@ Material.prototype.get_contract_status_html = function(status) {
  * @param {element} obj 
  */
 Material.prototype.subscription_finish = function(obj) {
+    var self = this;
     if (confirm('仮契約を本契約に登録します、よろしいですか？') == true) {
         utils.ajax_post(
             obj.href, {}
         ).done(function(result){
-            if (result.error) {
-                alert(result.message);
-            } else {
-                self.toast('本契約に登録しました', config.setting.toast_timeout);
-                window.location = result.url;
-            }
+            self.toast('本契約に登録しました', config.setting.toast_timeout);
+            window.location = result.url;
         }).fail(function(result) {
-            console.log(result.responseJSON);
+            self.toast_error(result.responseJSON.detail, config.setting.toast_timeout);
+        });
+    }
+};
+
+/**
+ * 契約手続きを破棄する、データを削除することになる。
+ * @param {element} obj 
+ */
+Material.prototype.subscription_destroy = function(obj) {
+    var self = this;
+    if (confirm('契約手続きを破棄します、よろしいですか？\n破棄されましたら、復元することはできません。')) {
+        utils.ajax_delete(
+            obj.href, {}
+        ).done(function(result){
+            self.toast('契約手続きを破棄しました。', config.setting.toast_timeout);
+            window.location = $(obj).attr('data-target-href');
+        }).fail(function(result) {
+            self.toast_error(result.responseJSON.detail, config.setting.toast_timeout);
         });
     }
 };
