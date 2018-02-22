@@ -23,6 +23,8 @@ module.exports = Config = {
         api_add_inquiry: '/api/inquiry/',
         // 空き待ち登録
         api_add_waiting: '/api/waiting/',
+        // 郵便番号により住所取得
+        api_get_address_by_post_code: '/api/postcode_list/',
         // 車室詳細のＵＲＬフォーマット
         format_parking_position_url: '/whiteboard/whiteboard-position-%s.html'
     },

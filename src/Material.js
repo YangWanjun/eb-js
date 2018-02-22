@@ -267,7 +267,7 @@ Material.prototype.mail_sent_success_fn = function(result, frmObj) {
     if (result.error) {
         alert(result.message);
     } else {
-        Materialize.toast('メール送信しました!', config.setting.toast_timeout);
+        self.toast('メール送信しました!', config.setting.toast_timeout);
         var btnSendMail = $(frmObj).closest('div.collapsible-body').find('a.task-mail');
         // 進捗更新
         self.update_task_info(btnSendMail, '99');
@@ -336,7 +336,7 @@ Material.prototype.task_finish = function(obj, url, task_name) {
     if (confirm('「' + task_name + '」のタスクを完了とします、よろしいですか？') == true) {
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '99') {
-                Materialize.toast('「' + task_name + '」のタスクは完了しました。', config.setting.toast_timeout);
+                self.toast('「' + task_name + '」のタスクは完了しました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).prev().addClass('disabled');
                 self.update_task_info(obj, result.status);
@@ -353,7 +353,7 @@ Material.prototype.task_skip = function(obj, url, task_name) {
     if (confirm('「' + task_name + '」のタスクをスキップします、よろしいですか？') == true) {
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '10') {
-                Materialize.toast('「' + task_name + '」のタスクはスキップしました。', config.setting.toast_timeout);
+                self.toast('「' + task_name + '」のタスクはスキップしました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).next().addClass('disabled');
                 self.update_task_info(obj, result.status);
@@ -376,7 +376,7 @@ Material.prototype.task_undo = function(obj, url, task_name) {
     if (confirm('「' + task_name + '」のタスクを未実施の状態に戻ります、よろしいですか？') == true) {
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '01') {
-                Materialize.toast('「' + task_name + '」のタスクは未実施の状態に戻りました。', config.setting.toast_timeout);
+                self.toast('「' + task_name + '」のタスクは未実施の状態に戻りました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).next().removeClass('disabled');
                 self.update_task_info(obj, result.status);
@@ -393,7 +393,7 @@ Material.prototype.contract_cancel = function(obj, url) {
     if (confirm('このタスクをキャンセルすると、契約は破棄することになるので、よろしいですか？') == true) {
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '91') {
-                Materialize.toast('契約はキャンセルしました。', config.setting.toast_timeout);
+                self.toast('契約はキャンセルしました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).next().addClass('disabled');
                 self.update_task_info(obj, result.status);
@@ -542,6 +542,9 @@ Material.prototype.combine_parking_position = function(position) {
         } else if (position.position_status == '04') {
             // 仮押さえ
             class_name = 'blue-text';
+        } else if (position.position_status == '05') {
+            // 貸止め
+            class_name = 'red-text';
         }
         html += '<a class="' + class_name + '" data-turbolinks="false" style="margin:0px 3px;" href="' + url + '">' + position.name + '</a>';
     }
@@ -590,8 +593,12 @@ Material.prototype.save_value = function(obj) {
     } else {
         user_info[ele_id] = $(obj).val();
         // HiddenFieldの項目がある場合、その値も設定する。
-        var target_id = $("#" + ele_id).attr('eb-autocomplete-target-id');
+        var target_id = $("#" + ele_id).attr('data-eb-autocomplete-target-id');
         if (target_id) {
+            if ($(obj).val() == "") {
+                // 主項目が空白の場合、HiddenField項目も空白にする。
+                $("#" + target_id).val("");
+            }
             user_info[target_id] = $("#" + target_id).val();
         }
     }
@@ -638,7 +645,7 @@ Material.prototype.clear_user_info = function() {
             $(obj).val('');
             $(obj).next().removeClass('active');
             // HiddenFieldの項目がある場合、その値も設定する。
-            var target_id = $(obj).attr('eb-autocomplete-target-id');
+            var target_id = $(obj).attr('data-eb-autocomplete-target-id');
             if (target_id) {
                 $("#" + target_id).val('');
             }
@@ -662,7 +669,7 @@ Material.prototype.save_inquiry = function(obj) {
                 config.setting.api_add_inquiry,
                 user_info
             ).done(function(result){
-                Materialize.toast(config.message.ADDED_INQUIRY, config.setting.toast_timeout);
+                self.toast(config.message.ADDED_INQUIRY, config.setting.toast_timeout);
             }).fail(function(result) {
                 console.log(result.responseJSON);
             });
@@ -682,17 +689,23 @@ Material.prototype.waiting_from_inquiry = function(obj) {
         $(obj).addClass('eb-disabled');
         var user_info = self.get_user_info();
         if (user_info) {
-            console.log(user_info);
+            // 希望駐車場／エリアが選択されたかをチェック
+            if (!user_info.target_parking_lot_name && !user_info.target_city_name && !user_info.target_aza_name) {
+                $(obj).removeClass('eb-disabled');
+                self.toast_error('希望駐車場または希望エリアはまだ選択されていません。');
+                return false;
+            }
             utils.ajax_post(
                 config.setting.api_add_waiting,
                 user_info
             ).done(function (result) {
-                Materialize.toast(config.message.ADDED_WAITING, config.setting.toast_timeout);
+                self.toast(config.message.ADDED_WAITING, config.setting.toast_timeout);
             }).fail(function (result) {
                 console.log(result.responseJSON);
                 $(obj).removeClass('eb-disabled');
             });
         }
+        return true;
     }
 };
 
@@ -703,8 +716,8 @@ Material.prototype.match_parking_lot = function(datatable) {
     var self = this;
     var user_info = self.get_user_info();
     if (user_info) {
-        if (user_info.parking_lot_name) {
-            datatable.search( user_info.parking_lot_name ).draw();
+        if (user_info.target_parking_lot_name) {
+            datatable.search( user_info.target_parking_lot_name ).draw();
         }
     }
 }
@@ -722,6 +735,8 @@ Material.prototype.get_contract_status_html = function(status) {
         html = '<span class="new badge left grey" data-badge-caption="空無" style="margin-left: 0px;"></span>';
     } else if (status === '04') {
         html = '<span class="new badge left blue" data-badge-caption="仮押" style="margin-left: 0px;"></span>';
+    } else if (status === '05') {
+        html = '<span class="new badge left red" data-badge-caption="貸止" style="margin-left: 0px;"></span>';
     } else {
         html = status;
     }
@@ -740,7 +755,7 @@ Material.prototype.subscription_finish = function(obj) {
             if (result.error) {
                 alert(result.message);
             } else {
-                Materialize.toast('本契約に登録しました', config.setting.toast_timeout);
+                self.toast('本契約に登録しました', config.setting.toast_timeout);
                 window.location = result.url;
             }
         }).fail(function(result) {
@@ -757,6 +772,13 @@ Material.prototype.toast = function(message) {
     Materialize.toast(message, config.setting.toast_timeout);
 };
 
+/**
+ * エラーメッセージを表示する
+ * @param {string} message 
+ */
+Material.prototype.toast_error = function(message) {
+    Materialize.toast(message, config.setting.toast_timeout, "deep-orange");
+};
 /**
  * すべて選択／すべて外す
  * @param {element} obj 
@@ -785,4 +807,19 @@ Material.prototype.check_single = function(name) {
             $(this).closest('tr').removeClass("green-text");
         }
     });
+};
+
+/**
+ * DataTableに変更時、ページング用のプルダウンをテーブルの右上に移動する。
+ * @param {string} tblId 
+ * @param {string} moveToId 
+ */
+Material.prototype.remove_paging_dropdown = function(tblId, moveToId) {
+    // PageSizeのドロップダウンをタイトル欄に移動する。
+    $("#" + tblId + "_length").appendTo("#" + moveToId);
+    $("#" + tblId + "_length").addClass("right");
+    $("#" + tblId + "_length select").addClass("browser-default");
+    $("#" + tblId + "_length select").css("width", "60px");
+    $("#" + tblId + "_length select").css("height", "25px");
+    $("#" + tblId + "_length select").css("display", "inherit");
 };

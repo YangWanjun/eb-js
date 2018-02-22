@@ -9,6 +9,7 @@ module.exports = {
     './src/Material.js',
     './src/Autocomplete.js',
     './src/gMap.js',
+    './src/Address.js',
   ],
   devtool: 'inline-source-map',
   resolve: {
@@ -16,6 +17,7 @@ module.exports = {
     alias: {
       'config': path.resolve(__dirname, './src/Config'),
       'utils': path.resolve(__dirname, './src/Utils'),
+      'constants': path.resolve(__dirname, './src/Constants'),
     }
   },
   plugins: [
@@ -25,6 +27,7 @@ module.exports = {
       jQuery: 'jquery',
       config: 'config',
       utils: 'utils',
+      constants: 'constants',
     }),
     //new webpack.optimize.UglifyJsPlugin({
     //  compress: {
