@@ -228,7 +228,7 @@ Material.prototype.reflection_form_errors = function(form_obj, error_list) {
 
 /**
  * タスクにメール送信のイベント
- * @param {string} frmId 
+ * @param {String} frmId 
  */
 Material.prototype.send_task_mail = function(frmId, success_fn, failure_fn, always_fn) {
     var self = this;
@@ -269,10 +269,7 @@ Material.prototype.mail_sent_success_fn = function(result, frmObj) {
         self.toast('メール送信しました!', config.setting.toast_timeout);
         var btnSendMail = $(frmObj).closest('div.collapsible-body').find('a.task-mail');
         // 進捗更新
-        self.update_task_info(btnSendMail, '99');
-        // 前回送信時間と送信者
-        btnSendMail.closest('li').find('span.updated_date').text(result.updated_date);
-        btnSendMail.closest('li').find('span.updated_user').text(result.updated_user);
+        self.update_task_info(btnSendMail, result);
     }
 };
 
@@ -333,15 +330,18 @@ Material.prototype.task_finish = function(obj, url, task_name) {
     var self = this;
     // タスクを完了とします。
     if (confirm('「' + task_name + '」のタスクを完了とします、よろしいですか？') == true) {
+        utils.loading();
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '99') {
                 self.toast('「' + task_name + '」のタスクは完了しました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).prev().addClass('disabled');
-                self.update_task_info(obj, result.status);
+                self.update_task_info(obj, result);
             }
         }).fail(function(result) {
             alert(result.responseJSON.detail);
+        }).always(function(result) {
+            utils.loaded();
         });
     }
 };
@@ -350,15 +350,18 @@ Material.prototype.task_skip = function(obj, url, task_name) {
     var self = this;
     // タスクを完了とします。
     if (confirm('「' + task_name + '」のタスクをスキップします、よろしいですか？') == true) {
+        utils.loading();
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '10') {
                 self.toast('「' + task_name + '」のタスクはスキップしました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).next().addClass('disabled');
-                self.update_task_info(obj, result.status);
+                self.update_task_info(obj, result);
             }
         }).fail(function(result) {
             alert(result.responseJSON.detail);
+        }).always(function(result) {
+            utils.loaded();
         });
     }
 };
@@ -373,15 +376,18 @@ Material.prototype.task_undo = function(obj, url, task_name) {
     var self = this;
     // タスクを完了とします。
     if (confirm('「' + task_name + '」のタスクを未実施の状態に戻ります、よろしいですか？') == true) {
+        utils.loading();
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '01') {
                 self.toast('「' + task_name + '」のタスクは未実施の状態に戻りました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).next().removeClass('disabled');
-                self.update_task_info(obj, result.status);
+                self.update_task_info(obj, result);
             }
         }).fail(function(result) {
             alert(result.responseJSON.detail);
+        }).always(function(result) {
+            utils.loaded();
         });
     }
 };
@@ -390,34 +396,46 @@ Material.prototype.contract_cancel = function(obj, url) {
     var self = this;
     // タスクを完了とします。
     if (confirm('このタスクをキャンセルすると、契約は破棄することになるので、よろしいですか？') == true) {
+        utils.loading();
         utils.ajax_put(url, {}).done(function(result) {
             if (result.status === '91') {
                 self.toast('契約はキャンセルしました。', config.setting.toast_timeout);
                 $(obj).addClass('disabled');
                 $(obj).next().addClass('disabled');
-                self.update_task_info(obj, result.status);
+                self.update_task_info(obj, result);
             }
         }).fail(function(result) {
             alert(result.responseJSON.detail);
+        }).always(function(result) {
+            utils.loaded();
         });
     }
 };
 
-Material.prototype.update_task_info = function(obj, status) {
+Material.prototype.update_task_info = function(obj, result) {
     var self = this;
-    self.set_task_status($(obj).closest('li'), status);
+    self.set_task_status($(obj).closest('li'), result.status);
     // 進捗を更新する。
     var total = $(obj).closest('ul.collapsible').find('li').length;
     var count = $(obj).closest('ul.collapsible').find('.badge.grey').length;
     $(obj).closest('div.card-content').find('span.percentage').text(Math.round((count/total) * 1000) / 10);
     $(obj).closest('div.card-content').find('.determinate').css('width', Math.round((count/total) * 1000) / 10 + '%');
     // 取り消しのボタンを活性化する
-    if (status === '01') {
+    if (result.status === '01') {
         $(obj).closest('div').find('a.task').removeClass('disabled');
         $(obj).closest('div').find('a.task-undo').addClass('disabled');
     } else {
         $(obj).closest('div').find('a.task').addClass('disabled');
         $(obj).closest('div').find('a.task-undo').removeClass('disabled');
+    }
+    // 前回送信時間と送信者
+    var objLi = $(obj).closest('li');
+    if (objLi.find('span.updated_user').length > 0) {
+        objLi.find('span.updated_date').text(utils.formatDate(result.updated_date, 'YYYY年MM月DD日 hh:mm'));
+        objLi.find('span.updated_user').text(result.updated_user_name);
+    } else {
+        objLi.find('div.updated_datetime div:first-child').html('<span style="font-weight: bold;">前回実施日時：</span><span class="updated_date">' + utils.formatDate(result.updated_date, 'YYYY年MM月DD日 hh:mm') + '</span>');
+        objLi.find('div.updated_datetime div:last-child').html('<span style="font-weight: bold;">実施者：</span><span class="updated_user">' + result.updated_user_name + '</span>');
     }
 };
 
