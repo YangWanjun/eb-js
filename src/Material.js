@@ -211,7 +211,7 @@ Material.prototype.reflection_form_errors = function(form_obj, error_list) {
         $(".invalid").removeClass('invalid');
         $(form_obj).find('div.errors').remove();
         $.each(Object.keys(error_list), function(index, key) {
-            var obj = $("#id_" + key);
+            var obj = $("#id_" + key, form_obj);
             if (obj.prop('tagName').toUpperCase() === 'SELECT') {
                 obj.parent().find('input[type=text]').addClass('invalid');
             } else {
@@ -767,6 +767,7 @@ Material.prototype.get_contract_status_html = function(status) {
 Material.prototype.subscription_finish = function(obj) {
     var self = this;
     if (confirm('仮契約を本契約に登録します、よろしいですか？') == true) {
+        utils.loading();
         utils.ajax_post(
             obj.href, {}
         ).done(function(result){
@@ -774,6 +775,8 @@ Material.prototype.subscription_finish = function(obj) {
             window.location = result.url;
         }).fail(function(result) {
             self.toast_error(result.responseJSON.detail, config.setting.toast_timeout);
+        }).always(function(result) {
+            utils.loaded();
         });
     }
 };
@@ -785,6 +788,7 @@ Material.prototype.subscription_finish = function(obj) {
 Material.prototype.subscription_destroy = function(obj) {
     var self = this;
     if (confirm('契約手続きを破棄します、よろしいですか？\n破棄されましたら、復元することはできません。')) {
+        utils.loading();
         utils.ajax_delete(
             obj.href, {}
         ).done(function(result){
@@ -792,6 +796,8 @@ Material.prototype.subscription_destroy = function(obj) {
             window.location = $(obj).attr('data-target-href');
         }).fail(function(result) {
             self.toast_error(result.responseJSON.detail, config.setting.toast_timeout);
+        }).always(function(result) {
+            utils.loaded();
         });
     }
 };

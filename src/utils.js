@@ -317,4 +317,10 @@ Utils.prototype.formatDate = function (date, format) {
     return format;
 };
 
+Utils.prototype.initForm = function(frmObj, data) {
+    $.each(Object.keys(data), function(i, key) {
+        $("[name=" + key + "]", frmObj).val(data[key]);
+    });
+};
+
 module.exports = new Utils();
