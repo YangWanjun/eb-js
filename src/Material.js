@@ -861,3 +861,55 @@ Material.prototype.remove_paging_dropdown = function(tblId, moveToId) {
     $("#" + tblId + "_length select").css("height", "25px");
     $("#" + tblId + "_length select").css("display", "inherit");
 };
+
+/**
+ * 必須項目の入力チェック
+ */
+Material.prototype.check_required = function() {
+    var self = this;
+    // 必須項目を洗い出す
+    $("input[required]").each(function(i, obj) {
+        var input_type = $(obj).attr('type');
+        if (input_type === 'text') {
+            if ($(obj).val() == "") {
+                self.show_required_balloon(obj);
+                return false;
+            }
+        }
+    });
+};
+
+/**
+ * 必須項目の吹き出しを表示する。
+ * @param {element} obj 
+ */
+Material.prototype.show_required_balloon = function(obj) {
+//'<div class="balloon_wrapper">' + 
+//    '<div class="balloon_box">' +
+//        'このフィールドを入力してください。' +
+//    '</div>' +
+//'</div>'
+};
+
+/**
+ * フリガナを取得する。
+ * @param {String} sentence
+ */
+Material.prototype.get_furigana = function(sentence) {
+    var furigana = ''
+    if (sentence) {
+        utils.ajax_get(
+            config.setting.api_get_furigana, 
+            {search: sentence},
+            false
+        ).done(function(result) {
+            furigana = result.katakana;
+        }).fail(function(result) {
+            console.log(result);
+            furigana = '';
+        }).always(function(result){
+            // debugger;
+        });
+    }
+    return furigana;
+};

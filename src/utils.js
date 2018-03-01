@@ -22,23 +22,23 @@ Utils.prototype.csrfSafeMethod = function(method) {
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 };
 
-Utils.prototype.ajax_get = function(url, params) {
-    return this.ajax_request(url, "GET", params);
+Utils.prototype.ajax_get = function(url, params, is_async) {
+    return this.ajax_request(url, "GET", params, is_async);
 };
 
-Utils.prototype.ajax_post = function(url, params) {
-    return this.ajax_request(url, "POST", params);
+Utils.prototype.ajax_post = function(url, params, is_async) {
+    return this.ajax_request(url, "POST", params, is_async);
 };
 
-Utils.prototype.ajax_put = function(url, params) {
-    return this.ajax_request(url, "PUT", params);
+Utils.prototype.ajax_put = function(url, params, is_async) {
+    return this.ajax_request(url, "PUT", params, is_async);
 };
 
-Utils.prototype.ajax_delete = function(url, params) {
-    return this.ajax_request(url, "DELETE", params);
+Utils.prototype.ajax_delete = function(url, params, is_async) {
+    return this.ajax_request(url, "DELETE", params, is_async);
 };
 
-Utils.prototype.ajax_request = function(url, method, params) {
+Utils.prototype.ajax_request = function(url, method, params, is_async) {
     var self = this;
     var csrftoken = self.getCookie('csrftoken');
 
@@ -50,12 +50,20 @@ Utils.prototype.ajax_request = function(url, method, params) {
         }
     });
 
+    // 同期／非同期
+    if (typeof is_async === "undefined") {
+        is_async = true;
+    } else if (is_async === false) {
+        is_async = false
+    } else {
+        is_async = true
+    }
     return jQuery.ajax({
         type: method,
         url: url,
         data: params,
         dataType: "json",
-        async: true
+        async: is_async
     });
 };
 
@@ -321,6 +329,17 @@ Utils.prototype.initForm = function(frmObj, data) {
     $.each(Object.keys(data), function(i, key) {
         $("[name=" + key + "]", frmObj).val(data[key]);
     });
+};
+
+/**
+ * コピー／貼り付け禁止
+ * @param {element} obj 
+ */
+Utils.prototype.disableCopyPaste = function(obj) {
+    $(obj).on('copy paste drag drop contextmenu', function(e) {
+        e.preventDefault();
+    });
+    $(obj).attr('autocomplete', 'false');
 };
 
 module.exports = new Utils();
