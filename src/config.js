@@ -27,6 +27,8 @@ module.exports = Config = {
         api_get_address_by_post_code: '/api/postcode_list/',
         // フリガナ取得
         api_get_furigana: '/api/furigana/',
+        // システム設定を取得する
+        api_format_system_config: '/api/config/%s/',
         // 車室詳細のＵＲＬフォーマット
         format_parking_position_url: '/whiteboard/whiteboard-position-%s.html'
     },

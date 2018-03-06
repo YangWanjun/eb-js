@@ -896,7 +896,7 @@ Material.prototype.show_required_balloon = function(obj) {
  * @param {String} sentence
  */
 Material.prototype.get_furigana = function(sentence) {
-    var furigana = ''
+    var furigana = '';
     if (sentence) {
         utils.ajax_get(
             config.setting.api_get_furigana, 
@@ -912,4 +912,102 @@ Material.prototype.get_furigana = function(sentence) {
         });
     }
     return furigana;
+};
+
+/**
+ * フリガナを設定する。
+ * @param {element} obj
+ * @param {String} target_id 
+ */
+Material.prototype.set_furigana = function(obj, target_id) {
+    var self = this;
+    var furigana = self.get_furigana($(obj).val());
+    $("#" + target_id).val(furigana);
+};
+
+/**
+ * datepickerに今日の日付を設定する。
+ * @param {element} obj 
+ */
+Material.prototype.set_datepicker_today = function(obj) {
+    var today = utils.formatDate(new Date(), 'YYYY-MM-DD');
+    if ($(obj).parent().prev().attr('class') == "vDateField") {
+        $(obj).parent().prev().val(today);
+        $(obj).parent().next().addClass('active');
+    }
+};
+
+/**
+ * システム設定を取得する。
+ * @param {String} name 
+ */
+Material.prototype.get_config = function(name) {
+    var value = '';
+    if (name) {
+        utils.ajax_get(
+            utils.format(config.setting.api_format_system_config, name), 
+            {},
+            false
+        ).done(function(result) {
+            value = result.value;
+        }).fail(function(result) {
+            console.log(result);
+            value = '';
+        }).always(function(result){
+            // debugger;
+        });
+    }
+    return value;
+};
+
+/**
+ * 消費税の税率を取得する。
+ */
+Material.prototype.get_consumption_tax_rate = function() {
+    var value = this.get_config('consumption_tax_rate');
+    if (value) {
+        return parseFloat(value);
+    } else {
+        return 0.08;
+    }
+};
+
+/**
+ * 小数点の処理区分を取得する。
+ * 
+ * 0: 切り捨て
+ * 1: 四捨五入
+ * 2: 切り上げ
+ */
+Material.prototype.get_decimal_type = function() {
+    var value = this.get_config('decimal_type');
+    if (value) {
+        return value;
+    } else {
+        // デフォルトは切り捨て
+        return "0";
+    }
+};
+
+Material.prototype.set_tax_included = function(obj, target_id) {
+    var amount = parseInt($(obj).val());
+    var self = this;
+    var tax_rate = self.get_consumption_tax_rate();
+    var decimal_type = self.get_decimal_type();
+    if (amount) {
+        var tax = amount * tax_rate;
+        if (decimal_type === "0") {
+            // 切り捨て
+            tax = Math.floor(tax);
+        } else if (decimal_type == "1") {
+            // 四捨五入
+            tax = Math.round(tax);
+        } else if (decimal_type == "2") {
+            // 切り上げ
+            tax = Math.ceil(tax);
+        }
+        $("#" + target_id).val(amount + tax);
+    } else {
+        $("#" + target_id).val(0);
+    }
 };
