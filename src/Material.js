@@ -1011,3 +1011,63 @@ Material.prototype.set_tax_included = function(obj, target_id) {
         $("#" + target_id).val(0);
     }
 };
+
+/**
+ * 指定管理会社ＩＤによって、管理会社の情報を取得する。
+ * @param {Integer} company_id 
+ */
+Material.prototype.get_management_company = function(company_id) {
+    var value = {};
+    if (company_id) {
+        utils.ajax_get(
+            utils.format(config.setting.api_format_management_company, company_id), 
+            {},
+            false
+        ).done(function(result) {
+            value = result;
+        }).fail(function(result) {
+            console.log(result);
+        }).always(function(result){
+            // debugger;
+        });
+    }
+    return value;
+};
+
+/**
+ * 管理会社を選択時、管理会社担当者リストを自動反映する。
+ * @param {element} obj
+ * @param {String} target_id 
+ */
+Material.prototype.set_related_management_company_staff = function(obj, target_id) {
+    var self = this;
+    var data = self.get_management_company($(obj).val());
+    if ('staff_set' in data) {
+        var staff_list = data.staff_set;
+        var targetObj = $("#" + target_id);
+        var selectedItems = [];
+        var is_inital = false;
+        if ($(obj).attr('data-initial') === "true") {
+            selectedItems = targetObj.val();
+            $(obj).removeAttr('data-initial');
+            is_inital = true;
+        }
+        // ドロップダウンリストに項目を全部消す。
+        $("option", targetObj).each(function(i, optionObj) {
+            if ($(optionObj).val() != "") {
+                $(optionObj).remove();
+            }
+        });
+        // ドロップダウンリストに新しい項目を追加する。
+        if (staff_list.length > 0) {
+            $.each(staff_list, function(i, item) {
+                targetObj.append('<option value="' + item.id + '">' + item.name + '</option>');
+            });
+        }
+        if (is_inital) {
+            targetObj.val(selectedItems);
+        }
+
+        window.$("#" + target_id).material_select('update');
+    }
+};

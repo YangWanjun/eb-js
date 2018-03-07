@@ -29,6 +29,8 @@ module.exports = Config = {
         api_get_furigana: '/api/furigana/',
         // システム設定を取得する
         api_format_system_config: '/api/config/%s/',
+        // 管理会社情報を取得する。
+        api_format_management_company: '/api/management-company/%s/',
         // 車室詳細のＵＲＬフォーマット
         format_parking_position_url: '/whiteboard/whiteboard-position-%s.html'
     },
