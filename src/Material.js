@@ -472,7 +472,7 @@ Material.prototype.reset_mce_data_href = function() {
 
 Material.prototype.expand_parking_lot = function(obj, code) {
     var self = this;
-    self.collapse_all_parking_lot();
+    // self.collapse_all_parking_lot();
     var tr = $(obj).closest('tr');
     var td = $(obj).closest('td');
     var col_count = tr.children().length;
@@ -482,7 +482,7 @@ Material.prototype.expand_parking_lot = function(obj, code) {
     ).done(function(result) {
         td.html('<a href="javascript:void(0)"><i class="small material-icons" style="font-size: 22px;">expand_less</i></a>');
         $('a', td).click(function() { 
-            self.collapse_all_parking_lot();
+            // self.collapse_all_parking_lot();
             self.collapse_parking_lot(td, code); 
         });
         var tbl = self.get_expanded_positions_html(result);
@@ -504,6 +504,7 @@ Material.prototype.get_expanded_positions_html = function(result) {
     var self = this;
     var headHtml = '<table class="table bordered highlight"><thead><tr>' + 
     '<th style="padding-right: 0px;">車室</th>' +
+    '<th style="padding-right: 0px;">分類</th>' +
     '<th style="padding-right: 0px;">全長</th>' + 
     '<th style="padding-right: 0px;">全幅</th>' +
     '<th style="padding-right: 0px;">全高</th>' +
@@ -518,8 +519,9 @@ Material.prototype.get_expanded_positions_html = function(result) {
     '</tr></thead><tbody></tbody></table>';
     var tbl = $.parseHTML(headHtml);
     $.each(result, function(i, position) {
-        $('tbody', tbl).append('<tr>' + 
+        $('tbody', tbl).append('<tr>' +
         '<td style="padding-left: 0;">' + self.combine_parking_position(position) + '</td>' +
+        '<td>' + position.category.name + '</td>' +
         '<td>' + utils.toNumComma(position.length) + '</td>' +
         '<td>' + utils.toNumComma(position.width) + '</td>' +
         '<td>' + utils.toNumComma(position.height) + '</td>' +
@@ -571,7 +573,7 @@ Material.prototype.combine_parking_position = function(position) {
 Material.prototype.collapse_all_parking_lot = function() {
     var self = this;
     $('tr.appended-positions').each(function(i, tr) {
-        var code = $(tr).prev().children().first().text();
+        var code = $(tr).prev().children().last().attr("code");
         self.collapse_parking_lot($(tr).prev().children().last(), code);
         $(tr).remove();
     });
@@ -583,6 +585,10 @@ Material.prototype.collapse_parking_lot = function(cell, code) {
     $(cell).find('a').click(function() {
         self.expand_parking_lot(cell, code);
     });
+    var tr = $(cell).closest('tr').next();
+    if (tr.hasClass('appended-positions')) {
+        tr.remove();
+    }
 };
 
 /**
